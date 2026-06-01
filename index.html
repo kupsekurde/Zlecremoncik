@@ -28,7 +28,6 @@
 </nav>
 
 <main class="max-w-3xl mx-auto px-4 mt-10 relative z-20">
-    <!-- LOGOWANIE -->
     <div id="auth-panel" class="bg-white p-8 rounded-3xl card-shadow mb-8 border border-slate-100">
         <div class="space-y-4">
             <input id="email" type="email" placeholder="E-mail" class="w-full bg-slate-50 border-2 p-4 rounded-2xl outline-none focus:border-blue-400">
@@ -40,7 +39,6 @@
         </div>
     </div>
 
-    <!-- PANEL DODAWANIA -->
     <div id="add-panel" class="hidden bg-white p-8 rounded-3xl card-shadow mb-12 border-2 border-blue-50">
         <div class="space-y-4">
             <div class="p-1 bg-slate-100 rounded-2xl flex gap-1 mb-4">
@@ -69,7 +67,6 @@
         </div>
     </div>
 
-    <!-- FILTRY WIDOKU -->
     <div class="mb-8 flex flex-wrap gap-2 justify-center">
         <button onclick="setView('wszystko')" id="v-all" class="px-6 py-2 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase">Wszystko</button>
         <button onclick="setView('klient')" id="v-klient" class="px-6 py-2 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase">Zlecenia</button>
@@ -83,6 +80,7 @@
 const SUPABASE_URL = "https://uodwrtpaesemcizdhcht.supabase.co";
 const SUPABASE_KEY = "sb_publishable_WVkoJLfkTfUD95EeSZMDQQ_VEhzlW6n";
 
+// Inicjalizacja klienta Supabase
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     auth: { persistSession: true, autoRefreshToken: true }
 });
@@ -91,7 +89,7 @@ let currentUser = null;
 let selectedRole = 'klient';
 let currentView = 'wszystko';
 
-// --- POPRAWKA: FUNKCJA OBSŁUGI STANU ZALOGOWANIA ---
+// Funkcja sprawdzająca stan zalogowania użytkownika
 async function checkUser() {
     const { data: { session } } = await db.auth.getSession();
     updateUI(session);
@@ -103,17 +101,16 @@ function updateUI(session) {
     document.getElementById('add-panel').classList.toggle('hidden', !session);
     document.getElementById('logout-btn').classList.toggle('hidden', !session);
     document.getElementById('user-info').innerText = session ? session.user.email : "";
-    load();
+    load(); // Ładujemy ogłoszenia po ustaleniu stanu użytkownika
 }
 
-// MONITOROWANIE ZMIAN (np. po zalogowaniu/wylogowaniu)
+// Monitorowanie dynamicznych zmian auth (zalogowanie/wylogowanie)
 db.auth.onAuthStateChange((event, session) => {
     updateUI(session);
 });
 
-// URUCHOMIENIE SPRAWDZANIA PRZY STARTU STRONY
+// Uruchomienie przy starcie strony
 checkUser();
-// ------------------------------------------------
 
 function setRole(role) {
     selectedRole = role;
@@ -131,29 +128,41 @@ function setView(view) {
 }
 
 async function signIn() {
+    const emailVal = document.getElementById('email').value;
+    const passwordVal = document.getElementById('password').value;
+    if(!emailVal || !passwordVal) { alert("Wpisz e-mail i hasło!"); return; }
+
     const { error } = await db.auth.signInWithPassword({ 
-        email: document.getElementById('email').value, 
-        password: document.getElementById('password').value 
+        email: emailVal, 
+        password: passwordVal 
     });
-    if (error) alert(error.message);
+    if (error) alert("Błąd logowania: " + error.message);
 }
 
 async function signUp() {
+    const emailVal = document.getElementById('email').value;
+    const passwordVal = document.getElementById('password').value;
+    if(!emailVal || !passwordVal) { alert("Wpisz e-mail i hasło!"); return; }
+
     const { error } = await db.auth.signUp({ 
-        email: document.getElementById('email').value, 
-        password: document.getElementById('password').value 
+        email: emailVal, 
+        password: passwordVal 
     });
-    if (error) alert(error.message); else alert("Rejestracja OK! Możesz się zalogować.");
+    if (error) alert("Błąd rejestracji: " + error.message); else alert("Rejestracja OK! Możesz się zalogować.");
 }
 
 async function signOut() { 
     await db.auth.signOut(); 
-    window.location.reload(); 
+    // updateUI() wywoła się automatycznie przez onAuthStateChange, nie trzeba przeładowywać okna.
 }
 
 async function add() {
     const tVal = document.getElementById("t").value;
     const pVal = document.getElementById("p").value;
+    const mVal = document.getElementById("m").value;
+    const kVal = document.getElementById("k").value;
+    const oVal = document.getElementById("o").value;
+
     if (!tVal || pVal.length !== 9) { alert("Podaj tytuł i 9 cyfr telefonu!"); return; }
     if (!currentUser) { alert("Zaloguj się ponownie!"); return; }
 
@@ -164,28 +173,39 @@ async function add() {
     spinner.classList.remove('hidden');
 
     try {
-        const file = document.getElementById('img-input').files[0];
+        const fileInput = document.getElementById('img-input');
+        const file = fileInput ? fileInput.files[0] : null;
         let photoUrl = "";
 
         if (file) {
-            const fileName = `${Date.now()}_img.jpg`;
+            const extension = file.name.split('.').pop();
+            const fileName = `${Date.now()}_img.${extension}`;
             const { data: upData, error: stErr } = await db.storage.from('ZDJECIA').upload(fileName, file);
             if (stErr) throw stErr;
             photoUrl = db.storage.from('ZDJECIA').getPublicUrl(fileName).data.publicUrl;
         }
 
         const { error: dbErr } = await db.from("Zlecenia").insert([{ 
-            Tytuł: tVal, Miasto: document.getElementById('m').value, Opis: document.getElementById('o').value, 
-            Telefon: pVal, Kategoria: document.getElementById('k').value, zdjecie_url: photoUrl,
-            user_id: currentUser.id, typ_wpisu: selectedRole, views: 0 
+            Tytuł: tVal, 
+            Miasto: mVal, 
+            Opis: oVal, 
+            Telefon: pVal, 
+            Kategoria: kVal, 
+            zdjecie_url: photoUrl,
+            user_id: currentUser.id, 
+            typ_wpisu: selectedRole, 
+            views: 0 
         }]);
 
         if (dbErr) throw dbErr;
         
-        // Reset formularza zamiast reloadu dla płynności
+        // Reset formularza
         document.getElementById("t").value = "";
+        document.getElementById("m").value = "";
         document.getElementById("o").value = "";
         document.getElementById("p").value = "";
+        if(fileInput) fileInput.value = "";
+        
         alert("Dodano pomyślnie!");
         load();
 
@@ -203,36 +223,50 @@ async function load() {
     let query = db.from("Zlecenia").select("*").order("id", { ascending: false });
     if (currentView !== 'wszystko') query = query.eq('typ_wpisu', currentView);
     
-    const { data } = await query;
+    const { data, error } = await query;
+    if (error) {
+        console.error("Błąd pobierania danych:", error);
+        return;
+    }
+
     const listEl = document.getElementById("list");
-    if (!data) return;
+    if (!data || data.length === 0) {
+        listEl.innerHTML = `<p class="text-center text-slate-400 text-sm py-10">Brak ogłoszeń do wyświetlenia.</p>`;
+        return;
+    }
 
     listEl.innerHTML = data.map(z => {
         const isOwner = currentUser && z.user_id === currentUser.id;
         const isPro = z.typ_wpisu === 'wykonawca';
         return `
             <div class="bg-white rounded-[2rem] card-shadow overflow-hidden border-2 ${isPro ? 'border-amber-100' : 'border-blue-50'}">
-                ${z.zdjecie_url ? `<img src="${z.zdjecie_url}" class="w-full h-48 object-cover">` : ''}
+                ${z.zdjecie_url ? `<img src="${z.zdjecie_url}" class="w-full h-48 object-cover" alt="Zdjęcie ogłoszenia">` : ''}
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-[9px] font-black px-2 py-1 rounded bg-slate-100 uppercase">${z.Kategoria}</span>
+                        <span class="text-[9px] font-black px-2 py-1 rounded bg-slate-100 uppercase">${z.Kategoria || 'Inne'}</span>
                         <span class="text-[9px] font-bold ${isPro ? 'text-amber-600' : 'text-blue-600'} uppercase">${isPro ? '⭐ Fachowiec' : '📝 Zlecenie'}</span>
                     </div>
                     <h3 class="text-xl font-black mb-1">${z.Tytuł}</h3>
-                    <p class="text-blue-500 font-bold text-xs mb-3 italic">📍 ${z.Miasto}</p>
-                    <p class="text-slate-600 text-sm mb-4 line-clamp-3 leading-relaxed">${z.Opis}</p>
+                    <p class="text-blue-500 font-bold text-xs mb-3 italic">📍 ${z.Miasto || 'Brak lokalizacji'}</p>
+                    <p class="text-slate-600 text-sm mb-4 line-clamp-3 leading-relaxed">${z.Opis || 'Brak opisu...'}</p>
                     ${currentUser 
                         ? `<a href="tel:${z.Telefon}" class="block w-full ${isPro ? 'bg-amber-500' : 'bg-green-500'} text-white text-center py-3 rounded-xl font-black uppercase text-sm">Zadzwoń: ${z.Telefon}</a>`
                         : `<p class="text-center text-slate-400 text-[10px] italic py-2">Zaloguj się, by zobaczyć numer</p>`
                     }
-                    ${isOwner ? `<button onclick="del(${z.id})" class="w-full mt-3 text-[9px] text-red-400 font-bold uppercase">Usuń moje</button>` : ''}
+                    ${isOwner ? `<button onclick="del(${z.id})" class="w-full mt-3 text-[9px] text-red-400 font-bold uppercase hover:text-red-600 transition-colors">Usuń moje</button>` : ''}
                 </div>
             </div>
         `;
     }).join("");
 }
 
-async function del(id) { if(confirm("Usunąć?")) { await db.from("Zlecenia").delete().eq('id', id); load(); } }
+async function del(id) { 
+    if(confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) { 
+        const { error } = await db.from("Zlecenia").delete().eq('id', id); 
+        if (error) alert("Błąd usuwania: " + error.message);
+        load(); 
+    } 
+}
 </script>
 </body>
 </html>
