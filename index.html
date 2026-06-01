@@ -10,13 +10,13 @@
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            /* Dodajemy zdjęcie jako tło całej strony */
-            background-image: linear-gradient(rgba(248, 250, 252, 0.85), rgba(248, 250, 252, 0.85)), url('kuchnia.png');
+            /* Wskazujemy na plik kuchnia.png, który jest w tym samym folderze na GitHubie */
+            background-image: linear-gradient(rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.88)), url('kuchnia.png');
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
         }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .card-shadow { box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08); }
         .hidden { display: none !important; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -24,7 +24,7 @@
 </head>
 <body class="text-slate-900">
 
-<nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
+<nav class="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="text-2xl font-extrabold tracking-tighter text-slate-800">Zleć<span class="text-blue-600">Remoncik</span></div>
         <div class="flex items-center gap-3">
