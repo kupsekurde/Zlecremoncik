@@ -277,7 +277,8 @@ async function add() {
             photoUrl = db.storage.from('ZDJECIA').getPublicUrl(fileName).data.publicUrl;
         }
 
-        const { error: dbErr } = await db.from("Zlecenia").insert([{ 
+        // TUTAJ POPRAWIONE NA MAŁE LITERKI: zlecenia
+        const { error: dbErr } = await db.from("zlecenia").insert([{
             tytul: tVal, 
             miasto: mVal, 
             opis: oVal, 
