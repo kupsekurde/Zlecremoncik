@@ -46,11 +46,18 @@ function setAuthRole(r) {
     document.getElementById('pro-fields').classList.toggle('hidden', r !== 'wykonawca');
 }
 
+function validatePassword(p) {
+    return p.length >= 8 && /[A-Z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p);
+}
+
 async function signUp() {
     const e = document.getElementById('reg-email').value.trim();
     const p = document.getElementById('reg-password').value;
     const phone = document.getElementById('reg-phone').value.trim();
     const role = document.getElementById('reg-role').value;
+
+    if(!e || !p) return alert("Podaj adres e-mail oraz hasło!");
+    if(!validatePassword(p)) return alert("Hasło musi zawierać min. 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
 
     if(!e || !p) return alert("Podaj adres e-mail oraz hasło!");
 
