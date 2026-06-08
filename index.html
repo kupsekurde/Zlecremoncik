@@ -350,8 +350,16 @@ async function executeRegister() {
     if(!e || !p) return alert("Podaj adres e-mail oraz hasło!");
     if (!validatePassword(p)) return alert("Hasło musi zawierać min. 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
 
+    // Wyłączenie przycisku, żeby użytkownik nie kliknął dwa razy
+    const btn = document.querySelector("#view-register button");
+    if(btn) { btn.disabled = true; btn.innerText = "Trwa rejestracja..."; }
+
     const { data, error } = await db.auth.signUp({ email: e, password: p });
-    if (error) return alert("Błąd rejestracji: " + error.message);
+    
+    if (error) {
+        if(btn) { btn.disabled = false; btn.innerText = "Załóż konto"; }
+        return alert("Błąd rejestracji: " + error.message);
+    }
 
     if (role === 'wykonawca' && data.user) {
         const checkedBoxes = document.querySelectorAll('.spec-checkbox-item:checked');
