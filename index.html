@@ -55,7 +55,7 @@
         <button onclick="toggleAccountMenu(false)" class="text-sm font-bold text-slate-400 hover:text-slate-600">✖ Zamknij</button>
     </div>
 
-    <!-- SEKCJA AKTYWNOŚCI (ZLECENIA / OGŁOSZENIA) -->
+    <!-- SEKCJA AKTYWNOŚCI -->
     <div class="mb-6">
         <h3 id="activity-title" class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">🗂 Twoja Aktywność</h3>
         <div id="user-posts-list" class="space-y-3"></div>
@@ -68,7 +68,7 @@
         </h3>
         <div id="user-chats-list" class="space-y-2 overflow-y-auto flex-1"></div>
         
-        <!-- OKIENKO CZATU SPECYFICZNEGO -->
+        <!-- OKIENKO CZATU -->
         <div id="chat-box" class="hidden flex flex-col h-[300px] border border-slate-200 rounded-2xl p-3 bg-slate-50 mt-2">
             <div class="flex justify-between items-center mb-2 border-b border-slate-200 pb-1">
                 <span id="chat-partner-name" class="text-[10px] font-black text-slate-700 uppercase">Rozmowa</span>
@@ -96,9 +96,15 @@
             </div>
 
             <input id="email" type="email" placeholder="E-mail" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
-            <input id="password" type="password" placeholder="Hasło" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
             
-            <!-- Specyficzne pola wykonawcy -->
+            <div class="relative w-full">
+                <input id="password" type="password" placeholder="Hasło" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
+                <div class="mt-1.5 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[10px] text-slate-500 leading-normal">
+                    <span class="font-bold text-slate-700 block mb-0.5">Wymogi bezpieczeństwa hasła przy rejestracji:</span>
+                    • min. 8 znaków | • duża litera | • liczba | • znak specjalny
+                </div>
+            </div>
+            
             <div id="pro-register-fields" class="hidden space-y-4 border-t border-dashed border-slate-200 pt-6 mt-4">
                 <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Szczegóły Firmy:</p>
                 <input id="reg-firma" placeholder="Nazwa firmy / Imię i Nazwisko" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
@@ -137,7 +143,7 @@
             <input id="t" placeholder="Tytuł ogłoszenia (np. Remont łazienki 5m2)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
             <div class="grid grid-cols-2 gap-4">
                 <input id="m" placeholder="Miasto" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
-                <input id="postcode" placeholder="Kod pocztowy (np. 00-001)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
+                <input id="postcode" placeholder="Kod pocztowy (Opcjonalnie)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
             </div>
             <select id="k" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none font-bold text-sm">
                 <option value="">Wybierz kategorię...</option>
@@ -204,41 +210,34 @@
         </div>
     </div>
 
-    <!-- STOPKA / REGULAMIN SERWISU -->
+    <!-- STOPKA -->
     <footer class="mt-20 border-t border-slate-200 pt-10 pb-10 text-[10px] text-slate-400 leading-relaxed">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
                 <h4 onclick="openLegal('regulamin')" class="font-black text-slate-600 mb-2 uppercase tracking-widest cursor-pointer hover:text-blue-600">📄 Regulamin platformy</h4>
-                <p>Zasady przydzielania oraz odnawiania punktów dla firm budowlanych. Obowiązki wykonawców i ograniczenia bezmyślnego zgłaszania się do przetargów.</p>
+                <p>Zasady przydzielania oraz odnawiania punktów dla firm budowlanych.</p>
             </div>
             <div>
                 <h4 onclick="openLegal('rodo')" class="font-black text-slate-600 mb-2 uppercase tracking-widest cursor-pointer hover:text-blue-600">🔒 RODO i Cookies</h4>
-                <p>Klauzule informacyjne dotyczące przetwarzania i weryfikacji adresów e-mail oraz numerów telefonów w celach kontaktowych.</p>
+                <p>Klauzule informacyjne dotyczące przetwarzania i weryfikacji adresów e-mail.</p>
             </div>
             <div>
                 <h4 onclick="openLegal('zasady')" class="font-black text-slate-600 mb-2 uppercase tracking-widest cursor-pointer hover:text-blue-600">💡 Jak to działa</h4>
-                <p>System pięciu chętnych i automatyczna blokada ogłoszeń. Informacje o korzyściach płynących ze zbierania wysokich ocen od klientów.</p>
+                <p>System pięciu chętnych i automatyczna blokada ogłoszeń.</p>
             </div>
         </div>
-        <div class="text-center mt-10 opacity-50 border-t border-slate-100 pt-4">© 2026 ZlećRemoncik - Profesjonalne usługi wykończeniowe i remontowe.</div>
+        <div class="text-center mt-10 opacity-50 border-t border-slate-100 pt-4">© 2026 ZlećRemoncik.</div>
     </footer>
 </main>
 
 <script>
-// KONFIGURACJA KLIENTA SUPABASE
 const SUPABASE_URL = "https://uodwrtpaesemcizdhcht.supabase.co";
 const SUPABASE_KEY = "sb_publishable_WVkoJLfkTfUD95EeSZMDQQ_VEhzlW6n";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentUser = null;
-let currentProfile = null;
-let selectedRole = 'klient';
-let authRole = 'klient';
-let currentView = 'wszystko';
-let activePartnerId = null; 
-let activeZlecenieId = null;
+let currentUser = null, currentProfile = null, selectedRole = 'klient', authRole = 'klient', currentView = 'wszystko';
+let activePartnerId = null, activeZlecenieId = null;
 
-// SESJA I ZARZĄDZANIE PROFILEM
 async function checkUser() {
     const { data: { session } } = await db.auth.getSession();
     updateUI(session);
@@ -277,7 +276,6 @@ db.auth.onAuthStateChange((event, session) => { updateUI(session); });
 checkUser();
 window.addEventListener('hashchange', checkUrlRoute);
 
-// INTERFEJS OBSŁUGI COOKIE
 if (localStorage.getItem('cookie-accept') === 'true') {
     document.getElementById('cookie-banner').classList.add('hidden');
 }
@@ -286,7 +284,6 @@ function acceptCookies() {
     document.getElementById('cookie-banner').classList.add('hidden');
 }
 
-// STRUKTURA INTERFEJSU REJESTRACJI
 function setAuthRole(role) {
     authRole = role;
     document.getElementById('auth-role-klient').className = role === 'klient' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
@@ -297,14 +294,33 @@ function setAuthRole(role) {
 async function signIn() {
     const e = document.getElementById('email').value;
     const p = document.getElementById('password').value;
-    const { error } = await db.auth.signInWithPassword({ email: e, password: p });
-    if (error) alert("Błąd logowania: " + error.message);
+    const { data, error } = await db.auth.signInWithPassword({ email: e, password: p });
+    if (error) return alert("Błąd logowania: " + error.message);
+    
+    // Blokada logowania dla niepotwierdzonych kont e-mail (jeśli Supabase tak skonfigurowano)
+    if (data?.user && !data.user.email_confirmed_at) {
+        await db.auth.signOut();
+        return alert("Twój adres e-mail nie został jeszcze aktywowany. Kliknij w link wysłany na Twoją skrzynkę pocztową.");
+    }
+}
+
+// WALIDACJA HASŁA PRZY REJESTRACJI
+function validatePassword(pass) {
+    if (pass.length < 8) return false;
+    if (!/[A-Z]/.test(pass)) return false;
+    if (!/[0-9]/.test(pass)) return false;
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass)) return false;
+    return true;
 }
 
 async function signUp() {
     const e = document.getElementById('email').value;
     const p = document.getElementById('password').value;
     if(!e || !p) return alert("Podaj adres email oraz bezpieczne hasło!");
+
+    if (!validatePassword(p)) {
+        return alert("Hasło nie spełnia wymogów bezpieczeństwa! Musi zawierać minimum 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
+    }
 
     const { data, error } = await db.auth.signUp({ email: e, password: p });
     if (error) return alert(error.message);
@@ -320,7 +336,11 @@ async function signUp() {
             punkty: 10
         }]);
     }
-    alert("Rejestracja pomyślna! Na Twój adres e-mail wysłaliśmy link aktywacyjny. Potwierdź go przed zalogowaniem.");
+    
+    // Wylogowanie z sesji tymczasowej, aby wymusić kliknięcie w link
+    await db.auth.signOut();
+    alert("Konto zostało zarejestrowane! Na Twój adres e-mail wysłaliśmy link aktywacyjny. Musisz go potwierdzić przed pierwszym zalogowaniem.");
+    window.location.reload();
 }
 
 async function signOut() { 
@@ -330,7 +350,6 @@ async function signOut() {
     setFilter('wszystko'); 
 }
 
-// SŁUŻY DO WYŚWIETLANIA BOCZNEGO MENU (OKIENKO MOJE KONTO)
 function toggleAccountMenu(open) {
     const sidebar = document.getElementById('account-sidebar');
     const overlay = document.getElementById('account-sidebar-overlay');
@@ -344,7 +363,6 @@ function toggleAccountMenu(open) {
     }
 }
 
-// SYSTEM DODAWANIA WPISÓW
 function setRole(role) {
     selectedRole = role;
     document.getElementById('role-klient').className = role === 'klient' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
@@ -360,15 +378,18 @@ async function add() {
     const oVal = document.getElementById("o").value;
     const pcVal = document.getElementById("postcode").value;
 
-    if (!tVal || pVal.length !== 9 || !pcVal) return alert("Uzupełnij formularz! Telefon musi mieć dokładnie 9 cyfr.");
+    if (!tVal || pVal.length !== 9) return alert("Uzupełnij formularz! Telefon musi mieć dokładnie 9 cyfr.");
 
     btn.disabled = true; btn.innerText = "Trwa publikowanie...";
+    
+    const insertData = {
+        tytul: tVal, miasto: mVal, opis: oVal, telefon: pVal, 
+        kategoria: kVal, user_id: currentUser.id, typ_wpisu: selectedRole
+    };
+    if (pcVal.trim() !== "") { insertData.kod_pocztowy = pcVal; }
+
     try {
-        await db.from("zlecenie").insert([{
-            tytul: tVal, miasto: mVal, opis: oVal, telefon: pVal, 
-            kategoria: kVal, kod_pocztowy: pcVal,
-            user_id: currentUser.id, typ_wpisu: selectedRole
-        }]);
+        await db.from("zlecenie").insert([insertData]);
         alert("Ogłoszenie pojawiło się na tablicy!");
         document.getElementById("t").value = "";
         document.getElementById("p").value = "";
@@ -378,7 +399,6 @@ async function add() {
     finally { btn.disabled = false; btn.innerText = "Opublikuj teraz"; }
 }
 
-// FILTROWANIE GŁÓWNEJ LISTY
 function setFilter(view) {
     currentView = view;
     ['v-all', 'v-klient', 'v-wykonawca'].forEach(id => {
@@ -389,7 +409,6 @@ function setFilter(view) {
     load();
 }
 
-// MONITOROWANIE TABLICY GŁÓWNEJ
 async function load() {
     let q = db.from("zlecenie").select("*, zgleszenia:zgloszenia(id)").order("id", { ascending: false });
     if (currentView !== 'wszystko') q = q.eq('typ_wpisu', currentView);
@@ -401,12 +420,13 @@ async function load() {
     listEl.innerHTML = data.map(z => {
         const totalReq = z.zgleszenia?.length || 0;
         const isFull = totalReq >= 5;
+        const locString = z.kod_pocztowy ? `${z.miasto} (${z.kod_pocztowy})` : z.miasto;
         return `
         <div onclick="openDetails(${z.id})" class="group bg-white rounded-[2rem] card-shadow overflow-hidden border border-slate-100 cursor-pointer hover:border-blue-300 transition-all p-6 relative">
-            ${isFull && z.typ_wpisu === 'klient' ? '<span class="absolute top-4 right-4 bg-red-50 text-red-500 text-[8px] font-black px-2 py-1 rounded-md uppercase">Zebrano już komplet chętnych</span>' : ''}
+            ${isFull && z.typ_wpisu === 'klient' ? '<span class="absolute top-4 right-4 bg-red-50 text-red-500 text-[8px] font-black px-2 py-1 rounded-md uppercase">Komplet chętnych</span>' : ''}
             <div class="flex justify-between text-[9px] font-black uppercase mb-3">
                 <span class="${z.typ_wpisu === 'wykonawca' ? 'text-amber-500' : 'text-blue-600'}">${z.typ_wpisu === 'wykonawca' ? '⭐ Fachowiec' : '📝 Zlecenie'}</span>
-                <span class="text-slate-400">📍 ${z.miasto} (${z.kod_pocztowy || '??-???'})</span>
+                <span class="text-slate-400">📍 ${locString}</span>
             </div>
             <h3 class="text-lg font-black group-hover:text-blue-600 transition-colors">${z.tytul}</h3>
             <p class="text-slate-500 text-xs mt-2 line-clamp-2 leading-relaxed">${z.opis}</p>
@@ -424,7 +444,6 @@ async function load() {
 function openDetails(id) { window.location.hash = `ogloszenie-${id}`; }
 function goBackToList() { window.location.hash = ""; document.getElementById('details-view').classList.add('hidden'); document.getElementById('list').classList.remove('hidden'); document.getElementById('filter-panel').classList.remove('hidden'); }
 
-// DETALE OGŁOSZEŃ I SYSTEM LIMITU 5 WYKONAWCÓW
 async function checkUrlRoute() {
     const hash = window.location.hash;
     if (!hash.startsWith('#ogloszenie-')) return;
@@ -441,13 +460,14 @@ async function checkUrlRoute() {
 
     let actionBtn = "";
     if (currentUser && z.typ_wpisu === 'klient' && z.user_id !== currentUser.id) {
-        // Blokada przycisku zgłoszeń przy osiagnięciu 5 chętnych
         if (totalApplicants >= 5) {
             actionBtn = `<div class="bg-red-50 text-red-600 p-4 rounded-2xl text-center font-black text-xs uppercase">Zebrano już komplet chętnych</div>`;
         } else {
             actionBtn = `<button onclick="applyForJob(${z.id})" class="w-full bg-amber-500 text-white py-5 rounded-2xl font-black uppercase text-sm shadow-lg shadow-amber-100 hover:scale-[1.01] transition-all">🙋 Jestem Zainteresowany (-1 pkt)</button>`;
         }
     }
+
+    const locString = z.kod_pocztowy ? `${z.miasto} (${z.kod_pocztowy})` : z.miasto;
 
     document.getElementById('details-content').innerHTML = `
         <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 space-y-6">
@@ -456,7 +476,7 @@ async function checkUrlRoute() {
                 <span class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">${z.kategoria || 'Inne'}</span>
             </div>
             <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-400 uppercase">
-                <span>📍 ${z.miasto} (${z.kod_pocztowy})</span>
+                <span>📍 ${locString}</span>
             </div>
             <div class="text-slate-600 leading-relaxed whitespace-pre-wrap border-t border-slate-50 pt-6">${z.opis}</div>
             ${z.typ_wpisu === 'klient' ? `
@@ -482,30 +502,28 @@ async function checkUrlRoute() {
     }
 }
 
-// KOSZT POBIERANIA PUNKTÓW ZA ZGŁOSZENIE
 async function applyForJob(zlecenieId) {
-    if (!currentProfile) return alert("Musisz posiadać profil wykonawcy, aby móc wysyłać oferty pracy!");
-    if (currentProfile.punkty < 1) return alert("Posiadasz za mało punktów na koncie. Poczekaj do poniedziałku na automatyczne odnowienie puli.");
+    if (!currentProfile) return alert("Musisz posiadać profil wykonawcy!");
+    if (currentProfile.punkty < 1) return alert("Posiadasz za mało punktów na koncie.");
     
     const { data: existing } = await db.from('zgloszenia').select('id').eq('zlecenie_id', zlecenieId).eq('wykonawca_id', currentUser.id).maybeSingle();
-    if(existing) return alert("Zgłosiłeś się już wcześniej do realizacji tego zlecenia!");
+    if(existing) return alert("Zgłosiłeś się już wcześniej!");
 
     const { error } = await db.from('zgloszenia').insert([{ zlecenie_id: zlecenieId, wykonawca_id: currentUser.id }]);
     if (error) {
         alert("Błąd operacji: " + error.message);
     } else {
         await db.from('profile_wykonawcow').update({ punkty: currentProfile.punkty - 1 }).eq('user_id', currentUser.id);
-        alert("Zgłoszenie przekazane do zleceniodawcy. Pobrano 1 punkt.");
+        alert("Zgłoszono pomyślnie. Pobrano 1 punkt.");
         checkUrlRoute();
         updateUI({user: currentUser});
     }
 }
 
-// STRUKTURA OPINII I PRZYZNAWANIE PUNKTÓW BONUSOWYCH ZA GWIAZDKI
 async function loadOpinions(wykonawcaId) {
     const { data } = await db.from('opinie').select('*').eq('wykonawca_id', wykonawcaId).order('id', {ascending: false});
     const list = document.getElementById('opinions-list');
-    if (!data || data.length === 0) { list.innerHTML = `<p class="text-center py-10 text-slate-400 italic">Ten fachowiec nie posiada jeszcze zebranych opinii od klientów.</p>`; return; }
+    if (!data || data.length === 0) { list.innerHTML = `<p class="text-center py-10 text-slate-400 italic">Ten fachowiec nie posiada jeszcze opinii.</p>`; return; }
     
     list.innerHTML = data.map(o => `
         <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
@@ -527,7 +545,7 @@ async function submitOpinion() {
     const stars = parseInt(document.getElementById('op-stars').value);
     const text = document.getElementById('op-text').value;
 
-    if(!em || !text) return alert("Uzupełnij swój e-mail oraz opis wrażeń z realizacji!");
+    if(!em || !text) return alert("Uzupełnij swój e-mail oraz opis!");
 
     const { error } = await db.from('opinie').insert([{ 
         wykonawca_id: targetZlecenie.user_id, 
@@ -550,17 +568,15 @@ async function submitOpinion() {
             if(prof) await db.from('profile_wykonawcow').update({ punkty: prof.punkty + bonus }).eq('user_id', targetZlecenie.user_id);
         }
 
-        alert(`Opinia została zapisana! Wykonawca otrzymał premię w wysokości: +${bonus} punktów.`);
+        alert(`Opinia została zapisana! Wykonawca otrzymał bonus: +${bonus} punktów.`);
         loadOpinions(targetZlecenie.user_id);
     }
 }
 
-// STRUKTURA PANELU BOCZNEGO: MOJE KONTO
 async function loadAccountPanel() {
     const postsList = document.getElementById('user-posts-list');
     
     if (!currentProfile) {
-        // ROLA: ZLECENIODAWCA - Wyświetla własne zlecenia wraz z listą maksymalnie 5 chętnych i numerami telefonów
         const { data: posts } = await db.from('zlecenie').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy, telefon))').eq('user_id', currentUser.id);
         postsList.innerHTML = posts && posts.length > 0 ? posts.map(p => `
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
@@ -577,29 +593,27 @@ async function loadAccountPanel() {
                             <span class="font-black text-[10px] text-slate-700 truncate max-w-[150px]">🏗️ ${z.profile_wykonawcow?.nazwa_firmy || 'Fachowiec'}</span>
                             <div class="flex gap-1 shrink-0">
                                 <button onclick="openChatBox('${z.wykonawca_id}', ${p.id}, '${z.profile_wykonawcow?.nazwa_firmy}')" class="bg-slate-800 text-white px-2 py-1 rounded text-[8px] font-black uppercase">Czat</button>
-                                <button onclick="alert('Numer kontaktowy fachowca: ${z.profile_wykonawcow?.telefon || 'Brak danych'}')" class="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black uppercase">🖨️ Telefon</button>
+                                <button onclick="alert('Numer kontaktowy fachowca: ${z.profile_wykonawcow?.telefon || 'Brak danych'}')" class="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black uppercase">📞 Telefon</button>
                             </div>
                         </div>
-                    `).join("") || '<p class="text-[9px] text-slate-400 uppercase">Oczekiwanie na oferty fachowców...</p>'}
+                    `).join("") || '<p class="text-[9px] text-slate-400 uppercase">Oczekiwanie na oferty...</p>'}
                 </div>
             </div>
-        `).join("") : `<p class="text-center py-6 text-slate-400 text-xs">Nie opublikowałeś jeszcze żadnego zlecenia.</p>`;
+        `).join("") : `<p class="text-center py-6 text-slate-400 text-xs">Nie dodałeś jeszcze ogłoszeń.</p>`;
     } else {
-        // ROLA: WYKONAWCA - Wyświetla zlecenia do których wysłał zgłoszenie zainteresowania
         const { data: apps } = await db.from('zgloszenia').select('*, zlecenie(id, tytul, user_id)').eq('wykonawca_id', currentUser.id);
         postsList.innerHTML = apps && apps.length > 0 ? apps.map(a => `
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex justify-between items-center text-xs">
-                <span class="font-bold text-slate-700 truncate max-w-[24px] flex-1">📌 ${a.zlecenie?.tytul || 'Zlecenie'}</span>
-                <button onclick="openChatBox('${a.zlecenie?.user_id}', ${a.zlecenie?.id}, 'Zleceniodawca')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase ml-2">Czat ze zleceniodawcą</button>
+                <span class="font-bold text-slate-700 truncate flex-1">📌 ${a.zlecenie?.tytul || 'Zlecenie'}</span>
+                <button onclick="openChatBox('${a.zlecenie?.user_id}', ${a.zlecenie?.id}, 'Zleceniodawca')" class="bg-blue-600 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase ml-2">Czat</button>
             </div>
-        `).join("") : `<p class="text-center py-6 text-slate-400 text-xs">Brak aktywnych zgłoszeń. Kliknij przycisk "Jestem Zainteresowany" pod wybranym ogłoszeniem.</p>`;
+        `).join("") : `<p class="text-center py-6 text-slate-400 text-xs">Brak aktywnych zgłoszeń.</p>`;
     }
-
     loadConversations();
 }
 
-// CZAT REALTIME Z POWIADOMIENIAMI O NOWYCH WIADOMOŚCIACH
 async function loadConversations() {
+    // NAPRAWIONE ZAPYTANIE OR DLA WIADOMOŚCI
     const { data: chats } = await db.from('wiadomosci').select('zlecenie_id, zlecenie:zlecenie(tytul), nadawca_id, odbiorca_id, czy_przeczytane').or(`nadawca_id.eq.${currentUser.id},odbiorca_id.eq.${currentUser.id}`);
     const chatsList = document.getElementById('user-chats-list');
     let unique = [];
@@ -612,8 +626,8 @@ async function loadConversations() {
         if(c.odbiorca_id === currentUser.id && !c.czy_przeczytane) unreadTotal++;
         
         if(!seen.has(key)) { 
-            激een = seen.add(key); 
-            unique.push({ partner, title: c.zlecenie?.tytul, zlId: c.zlecenie_id, unread: (c.odbiorca_id === currentUser.id && !c.czy_przeczytane) }); 
+            seen.add(key); 
+            unique.push({ partner, title: c.zlecenie?.tytul || "Ogłoszenie", zlId: c.zlecenie_id, unread: (c.odbiorca_id === currentUser.id && !c.czy_przeczytane) }); 
         }
     });
 
@@ -642,7 +656,6 @@ async function openChatBox(partnerId, zlId, partnerName) {
     document.getElementById('chat-box').classList.remove('hidden');
     document.getElementById('user-chats-list').classList.add('hidden');
     
-    // Oznaczenie jako przeczytane
     await db.from('wiadomosci').update({ czy_przeczytane: true }).eq('zlecenie_id', zlId).eq('nadawca_id', partnerId).eq('odbiorca_id', currentUser.id);
     loadMessages();
 }
@@ -663,7 +676,7 @@ async function loadMessages() {
             <p class="leading-tight">${m.tresc}</p>
             <p class="text-[7px] mt-1 opacity-60 text-right uppercase">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
         </div>
-    `).join("") || '<p class="text-center py-6 text-slate-400 text-[10px] uppercase">Napisz wiadomość, aby ustalić szczegóły pracy!</p>';
+    `).join("") || '<p class="text-center py-6 text-slate-400 text-[10px] uppercase">Napisz wiadomość!</p>';
     msgBox.scrollTop = msgBox.scrollHeight;
 }
 
@@ -675,22 +688,20 @@ async function sendMessage() {
     loadMessages();
 }
 
-// ZARZĄDZANIE WPISAMI
 async function del(id) { 
-    if(confirm("Czy na pewno chcesz bezpowrotnie usunąć to ogłoszenie oraz wszystkie powiązane zgłoszenia i wiadomości?")) { 
+    if(confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) { 
         await db.from("zlecenie").delete().eq('id', id); 
         loadAccountPanel(); 
     } 
 }
 async function editPost(id) { 
-    const nt = prompt("Wprowadź nową treść tytułu ogłoszenia:"); 
+    const nt = prompt("Wprowadź nowy tytuł:"); 
     if(nt) { 
         await db.from('zlecenie').update({tytul: nt}).eq('id', id); 
         loadAccountPanel(); 
     } 
 }
 
-// SYSTEM DOKUMENTÓW PRAWNYCH I REGULAMINÓW W MODALU
 function openLegal(type) {
     const modal = document.getElementById('legal-modal');
     const title = document.getElementById('legal-title');
@@ -699,25 +710,13 @@ function openLegal(type) {
     
     if(type === 'regulamin') {
         title.innerText = "Regulamin platformy ZlećRemoncik";
-        body.innerHTML = `
-            <p><strong>1. System Kont i Punktacji:</strong> Każdy wykonawca rejestrujący działalność w portalu otrzymuje darmowy pakiet startowy wynoszący 10 punktów.</p>
-            <p><strong>2. Koszty zgłoszeń:</strong> Wysłanie zgłoszenia chęci realizacji do opublikowanego zlecenia klienta obciąża konto wykonawcy o wartość 1 punktu.</p>
-            <p><strong>3. Automatyczne odnowienia:</strong> Pula punktowa wykonawców jest automatycznie zasilana o dodatkowe +3 punkty w każdy poniedziałek o godzinie 00:00.</p>
-            <p><strong>4. Blokady limitów:</strong> Na jedno ogłoszenie klienta system dopuszcza maksymalnie 5 zgłoszeń fachowców. Po osiągnięciu limitu, możliwość zgłaszania zostaje automatycznie zablokowana.</p>
-        `;
+        body.innerHTML = `<p>1. Każdy wykonawca otrzymuje 10 punktów na start.</p><p>2. Zgłoszenie kosztuje 1 punkt.</p><p>3. Pula odnawia się o +3 pkt w każdy poniedziałek o 00:00.</p><p>4. Maksymalny limit zgłoszeń na jedno ogłoszenie wynosi 5 osób.</p>`;
     } else if(type === 'rodo') {
-        title.innerText = "Polityka Prywatności, RODO i Cookie";
-        body.innerHTML = `
-            <p><strong>1. Administrator Danych:</strong> Administratorem danych osobowych podawanych w trakcie rejestracji i składania ogłoszeń jest portal ZlećRemoncik.</p>
-            <p><strong>2. Cel Przetwarzania:</strong> Dane w postaci adresu e-mail oraz telefonu kontaktowego przetwarzane są wyłącznie w celu prawidłowego parowania zleceniodawców z wykonawcami usług remontowych.</p>
-            <p><strong>3. Pliki Cookies:</strong> Portal wykorzystuje ciasteczka techniczne niezbędne do podtrzymywania zalogowanej sesji użytkownika w bazie danych Supabase. Masz prawo żądać usunięcia swoich danych z bazy w dowolnym momencie.</p>
-        `;
+        title.innerText = "Polityka Prywatności i RODO";
+        body.innerHTML = `<p>Dane takie jak adres e-mail oraz telefon kontaktowy są przetwarzane wyłącznie w celu komunikacji i parowania stron zlecenia.</p>`;
     } else {
-        title.innerText = "Zasady sprawiedliwego korzystania";
-        body.innerHTML = `
-            <p>System ograniczeń punktowych i limitu 5 wykonawców powstał po to, aby zapobiegać masowemu, automatycznemu rozsyłaniu ofert (tzw. "wyklikiwaniu") na każde ogłoszenie w kilkanaście minut.</p>
-            <p>Wykonawca zmuszony jest przeanalizować zakres prac i wybrać zlecenia w swojej okolicy, na których zna się najlepiej. Dodatkowo system nagradza rzetelnych fachowców darmowymi punktami za dobre opinie od klientów (np. 5 gwiazdek przyznaje bonusowe +5 punktów na konto).</p>
-        `;
+        title.innerText = "Zasady działania";
+        body.innerHTML = `<p>System nagradza rzetelnych wykonawców dodatkowymi punktami w zależności od przyznanej oceny (gwiazdek) przez zleceniodawcę.</p>`;
     }
 }
 function closeLegal() { document.getElementById('legal-modal').classList.add('hidden'); }
