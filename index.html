@@ -22,17 +22,18 @@
 </head>
 <body class="text-slate-900 pb-10">
 
+<!-- BANER COOKIE -->
 <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-4 z-50 text-xs flex flex-col sm:flex-row justify-between items-center gap-4 card-shadow">
     <p>Używamy plików cookie do zbierania danych i ulepszania naszych usług. Korzystając ze strony zgadzasz się na ich zapis w przeglądarce oraz akceptujesz politykę RODO. <button onclick="openLegal('rodo')" class="underline text-blue-400">Dowiedz się więcej</button></p>
     <button onclick="acceptCookies()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl font-bold uppercase whitespace-nowrap">Przyjmij</button>
 </div>
 
+<!-- NAWIGACJA -->
 <nav class="bg-white sticky top-0 z-40 border-b border-slate-200 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
         <div onclick="goBackToList()" class="text-2xl font-extrabold tracking-tighter text-slate-800 cursor-pointer">Zleć<span class="text-blue-600">Remoncik</span></div>
         <div class="flex items-center gap-2 sm:gap-3">
             <button id="nav-add-job-btn" onclick="toggleAddModal(true)" class="hidden text-[10px] font-black text-white bg-blue-600 px-4 py-2 rounded-full uppercase hover:bg-blue-700 transition-all tracking-wider shadow-md shadow-blue-100">ZlećRemoncik</button>
-            
             <span id="points-counter" class="hidden text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full uppercase"></span>
             <div class="relative">
                 <button id="my-account-btn" onclick="toggleAccountMenu(true)" class="hidden text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full uppercase hover:bg-blue-100 transition-all flex items-center gap-1">
@@ -44,6 +45,7 @@
     </div>
 </nav>
 
+<!-- MODAL: FORMULARZ DODAWANIA OGŁOSZENIA (ZLEĆREMONCIK) -->
 <div id="add-modal-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white p-6 sm:p-8 rounded-[2.5rem] card-shadow max-w-2xl w-full border border-slate-100 relative max-h-[90vh] overflow-y-auto">
         <button onclick="toggleAddModal(false)" class="absolute top-5 right-6 text-slate-400 hover:text-slate-600 font-bold text-lg">✖</button>
@@ -56,13 +58,12 @@
                 <input id="m" placeholder="Miasto" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
                 <input id="postcode" placeholder="Kod pocztowy (Opcjonalnie)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
             </div>
-            <select id="k" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none font-bold text-sm text-slate-700">
-                <option value="">Wybierz kategorię główną...</option>
-                <option value="Remonty kompleksowe">Remonty kompleksowe</option>
-                <option value="Elektryka">Elektryka</option>
-                <option value="Hydraulika">Hydraulika</option>
-                <option value="Wykończenia pod klucz">Wykończenia pod klucz</option>
+            
+            <!-- NAPRAWIONE: Pełna lista wszystkich 34 kategorii identyczna z rejestracją -->
+            <select id="k" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none font-bold text-sm text-slate-700 select-dynamic-categories">
+                <!-- Generowane automatycznie przez skrypt JS -->
             </select>
+            
             <textarea id="o" placeholder="Opisz dokładnie zakres prac lub swoje doświadczenie..." class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl h-32 outline-none focus:border-blue-400"></textarea>
             <input id="p" type="tel" maxlength="9" placeholder="Telefon kontaktowy do ogłoszenia (9 cyfr)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400">
             
@@ -71,6 +72,7 @@
     </div>
 </div>
 
+<!-- PANEL WYSÓWANY: MOJE KONTO -->
 <div id="account-sidebar-overlay" onclick="toggleAccountMenu(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden"></div>
 <div id="account-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white z-50 shadow-2xl slide-panel p-6 overflow-y-auto flex flex-col">
     <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
@@ -81,17 +83,20 @@
         <button onclick="toggleAccountMenu(false)" class="text-sm font-bold text-slate-400 hover:text-slate-600">✖ Zamknij</button>
     </div>
 
+    <!-- SEKCJA AKTYWNOŚCI -->
     <div class="mb-6">
         <h3 id="activity-title" class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">🗂 Twoja Aktywność</h3>
         <div id="user-posts-list" class="space-y-3"></div>
     </div>
 
+    <!-- SEKCJA CZATÓW -->
     <div class="border-t border-slate-100 pt-4 flex-1 flex flex-col">
         <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
             💬 Konwersacje <span id="chat-notify-count" class="bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[8px] hidden"></span>
         </h3>
         <div id="user-chats-list" class="space-y-2 overflow-y-auto flex-1"></div>
         
+        <!-- OKIENKO CZATU -->
         <div id="chat-box" class="hidden flex flex-col h-[300px] border border-slate-200 rounded-2xl p-3 bg-slate-50 mt-2">
             <div class="flex justify-between items-center mb-2 border-b border-slate-200 pb-1">
                 <span id="chat-partner-name" class="text-[10px] font-black text-slate-700 uppercase">Rozmowa</span>
@@ -106,53 +111,74 @@
     </div>
 </div>
 
+<!-- GŁÓWNA ZAWARTOŚĆ -->
 <main class="max-w-4xl mx-auto px-4 mt-8 relative z-20">
     
+    <!-- NOWY PANEL AUTORYZACJI PODZIELONY NA LEWĄ I PRAWĄ STRONĘ -->
     <div id="auth-panel" class="bg-white p-6 sm:p-10 rounded-[2.5rem] card-shadow mb-8 border border-slate-100">
-        <h2 class="text-center text-xl font-black mb-2 text-slate-800">Wejdź do ZlećRemoncik</h2>
-        <p class="text-center text-xs text-slate-400 mb-6">Wpisz dane – zalogujemy Cię lub automatycznie utworzymy nowe konto!</p>
+        <h2 class="text-center text-xl font-black mb-6 text-slate-800 tracking-tight">Witaj w ZlećRemoncik!</h2>
         
-        <div class="space-y-4 max-w-md mx-auto">
-            <div class="p-1 bg-slate-100 rounded-2xl flex gap-1 mb-2">
-                <button id="auth-role-klient" onclick="setAuthRole('klient')" class="flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase transition-all">Zleceniodawca</button>
-                <button id="auth-role-wykonawca" onclick="setAuthRole('wykonawca')" class="flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase transition-all">Wykonawca</button>
-            </div>
-
-            <input id="email" type="email" placeholder="Adres E-mail" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start max-w-3xl mx-auto">
             
-            <div class="relative w-full">
-                <input id="password" type="password" placeholder="Hasło" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
-                <div class="mt-1.5 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[9px] text-slate-400 leading-normal">
-                    <span class="font-bold text-slate-600 block mb-0.5">Wymogi bezpieczeństwa hasła przy nowej rejestracji:</span>
-                    • min. 8 znaków | • duża litera | • liczba | • znak specjalny
-                </div>
-            </div>
-
-            <div id="phone-field-wrapper" class="space-y-1">
-                <input id="reg-phone" type="tel" maxlength="9" placeholder="Numer telefonu (Opcjonalnie)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
-                <p id="phone-tip" class="text-[9px] text-amber-600 font-bold px-1">Pamiętaj! Podanie numeru uskuteczni realizację Zlecenia.</p>
-            </div>
-            
-            <div id="pro-register-fields" class="hidden space-y-4 border-t border-dashed border-slate-200 pt-4 mt-4">
-                <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Szczegóły Profilu Wykonawcy:</p>
-                <input id="reg-firma" placeholder="Nazwa firmy / Imię i Nazwisko" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
-                <input id="reg-nip" placeholder="NIP (Opcjonalnie)" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
-                <div class="grid grid-cols-2 gap-4">
-                    <input id="reg-miejscowosc" placeholder="Miejscowość" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
-                    <input id="reg-kod" placeholder="Kod pocztowy" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
+            <!-- LEWA STRONA: AKCJA (LOGOWANIE / REJESTRACJA) -->
+            <div class="space-y-4">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Krok 1: Wybierz Akcję</label>
+                <div class="p-1 bg-slate-100 rounded-2xl flex gap-1">
+                    <button id="auth-action-login" onclick="setAuthAction('login')" class="flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase transition-all">Zaloguj się</button>
+                    <button id="auth-action-register" onclick="setAuthAction('register')" class="flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase transition-all">Zarejestruj</button>
                 </div>
                 
-                <div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4">
-                    <p class="text-[10px] font-black text-slate-500 uppercase mb-3">Wybierz specjalizacje (zaznacz ptaszkami):</p>
-                    <div id="spec-checkboxes-container" class="space-y-2 max-h-48 overflow-y-auto text-xs font-semibold text-slate-700 pr-1"></div>
+                <div class="space-y-3 pt-2">
+                    <input id="email" type="email" placeholder="Adres E-mail" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
+                    
+                    <div class="relative w-full">
+                        <input id="password" type="password" placeholder="Hasło dostępu" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
+                        <div id="register-password-specs" class="hidden mt-1.5 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[9px] text-slate-400 leading-normal">
+                            <span class="font-bold text-slate-600 block mb-0.5">Wymogi bezpieczeństwa hasła:</span>
+                            • min. 8 znaków | • duża litera | • liczba | • znak specjalny
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <button onclick="handleAuth()" id="auth-main-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-blue-200 transition-all">Zaloguj lub Rozpocznij Rejestrację</button>
-            <p class="text-[9px] text-center text-slate-400 px-4">Kontynuując akceptujesz Regulamin, zasady punktacji, RODO oraz ciasteczka.</p>
+            
+            <!-- PRAWA STRONA: ROLA (ZLECENIODAWCA / WYKONAWCA) -->
+            <div class="space-y-4 border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Krok 2: Wybierz Typ Konta</label>
+                <div class="p-1 bg-slate-100 rounded-2xl flex gap-1">
+                    <button id="auth-role-klient" onclick="setAuthRole('klient')" class="flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase transition-all">Zleceniodawca</button>
+                    <button id="auth-role-wykonawca" onclick="setAuthRole('wykonawca')" class="flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase transition-all">Wykonawca</button>
+                </div>
+                
+                <!-- Pola telefonu kontaktowego -->
+                <div id="phone-field-wrapper" class="space-y-1 pt-2">
+                    <input id="reg-phone" type="tel" maxlength="9" placeholder="Numer telefonu (Opcjonalnie)" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all">
+                    <p id="phone-tip" class="text-[9px] text-amber-600 font-bold px-1">Pamiętaj! Podanie numeru uskuteczni realizację Zlecenia.</p>
+                </div>
+                
+                <!-- Ukryte/pokazywane pola szczegółów firmy wykonawcy -->
+                <div id="pro-register-fields" class="hidden space-y-3 pt-1">
+                    <input id="reg-firma" placeholder="Nazwa firmy / Imię i Nazwisko" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
+                    <input id="reg-nip" placeholder="NIP (Opcjonalnie)" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="reg-miejscowosc" placeholder="Miejscowość" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
+                        <input id="reg-kod" placeholder="Kod pocztowy" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none focus:border-blue-400">
+                    </div>
+                    
+                    <div class="bg-slate-50 border-2 border-slate-100 rounded-xl p-3">
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Zaznacz specjalizacje:</p>
+                        <div id="spec-checkboxes-container" class="space-y-1.5 max-h-36 overflow-y-auto text-[11px] font-semibold text-slate-700 pr-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PRZYCISK ZATWIERDZENIA -->
+        <div class="max-w-3xl mx-auto pt-6 border-t border-slate-100 mt-6 flex justify-center">
+            <button onclick="handleAuth()" id="auth-main-btn" class="max-w-md w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-blue-200 transition-all">Zaloguj do portalu</button>
         </div>
     </div>
 
+    <!-- SEKCJA FILTRÓW I NAGŁÓWKA NAJNOWSZYCH ZLECEŃ -->
     <div id="filter-panel" class="bg-white p-6 rounded-[2rem] card-shadow border border-slate-100 mb-8 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Najnowsze ZLECENIA</h2>
@@ -169,17 +195,14 @@
                 <input id="search-city" type="text" oninput="load()" placeholder="🔎 Wpisz Miasto, aby pofiltrować..." class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs outline-none focus:border-blue-400 transition-all font-semibold">
             </div>
             <div>
-                <select id="search-category" onchange="load()" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-600 outline-none focus:border-blue-400 transition-all">
-                    <option value="">📂 Wszystkie kategorie branżowe</option>
-                    <option value="Remonty kompleksowe">Remonty kompleksowe</option>
-                    <option value="Elektryka">Elektryka</option>
-                    <option value="Hydraulika">Hydraulika</option>
-                    <option value="Wykończenia pod klucz">Wykończenia pod klucz</option>
+                <select id="search-category" onchange="load()" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-600 outline-none focus:border-blue-400 transition-all select-dynamic-categories">
+                    <!-- Dynamicznie załadowane kategorie -->
                 </select>
             </div>
         </div>
     </div>
 
+    <!-- WIDOK: SZCZEGÓŁY OGŁOSZENIA -->
     <div id="details-view" class="hidden mb-12">
         <button onclick="goBackToList()" class="mb-6 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-xs uppercase hover:bg-slate-50 transition-all">← Powrót do listy</button>
         <div id="details-content"></div>
@@ -206,8 +229,10 @@
         </div>
     </div>
 
+    <!-- LISTA GŁÓWNA WPISÓW -->
     <div id="list" class="grid grid-cols-1 gap-4 pb-20"></div>
 
+    <!-- MODAL PRAWNY -->
     <div id="legal-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-lg w-full card-shadow max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -218,6 +243,7 @@
         </div>
     </div>
 
+    <!-- STOPKA -->
     <footer class="mt-20 border-t border-slate-200 pt-10 pb-10 text-[10px] text-slate-400 leading-relaxed">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -242,9 +268,10 @@ const SUPABASE_URL = "https://uodwrtpaesemcizdhcht.supabase.co";
 const SUPABASE_KEY = "sb_publishable_WVkoJLfkTfUD95EeSZMDQQ_VEhzlW6n";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentUser = null, currentProfile = null, selectedRole = 'klient', authRole = 'klient', currentView = 'wszystko';
+let currentUser = null, currentProfile = null, selectedRole = 'klient', authRole = 'klient', authAction = 'login', currentView = 'wszystko';
 let activePartnerId = null, activeZlecenieId = null;
 
+// KOMPLETNA BAZA 34 KATEGORII USŁUGOWYCH
 const SKLADNICA_SPECJALIZACJI = [
     "Prace Ogólnobudowlane i Konstrukcyjne", "Wyburzenia, kucie ścian i wywóz gruzu", "Murowanie i betonowanie",
     "Montaż okien i drzwi (Stolarka otworowa)", "Izolacje i docieplenia (Termomodernizacja)", "Wykończenie Wnętrz (Ściany i Sufity)",
@@ -260,8 +287,18 @@ const SKLADNICA_SPECJALIZACJI = [
     "Inne / Prace nietypowe"
 ];
 
+// DYNAMICZNE WSTRZYKNIĘCIE KATEGORII DO FORMULARZY WPISÓW I FILTRÓW
+const selectNodes = document.querySelectorAll('.select-dynamic-categories');
+selectNodes.forEach(node => {
+    const isFilter = node.id === 'search-category';
+    let optionsHtml = isFilter ? '<option value="">📂 Wszystkie kategorie branżowe</option>' : '<option value="">Wybierz kategorię główną prac...</option>';
+    optionsHtml += SKLADNICA_SPECJALIZACJI.map(spec => `<option value="${spec}">${spec}</option>`).join("");
+    node.innerHTML = optionsHtml;
+});
+
+// GENEROWANIE LISTY PTASZKÓW DLA PROFILU WYKONAWCY
 const containerCheckboxes = document.getElementById('spec-checkboxes-container');
-containerCheckboxes.innerHTML = SKLADNICA_SPECJALIZACJI.map((spec, i) => `
+containerCheckboxes.innerHTML = SKLADNICA_SPECJALIZACJI.map(spec => `
     <label class="flex items-start gap-2 cursor-pointer p-1 rounded hover:bg-slate-100 transition-colors">
         <input type="checkbox" value="${spec}" class="spec-checkbox-item mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
         <span>${spec}</span>
@@ -288,13 +325,11 @@ async function updateUI(session) {
         const addJobBtn = document.getElementById('nav-add-job-btn');
 
         if (currentProfile) {
-            // WYKONAWCA: Ukrywamy guzik ZlećRemoncik, pokazujemy punkty
             pCounter.innerText = `${currentProfile.punkty} PKT`;
             pCounter.classList.remove('hidden');
             addJobBtn.classList.add('hidden');
             document.getElementById('activity-title').innerText = "🗂 Zlecenia, w których bierzesz udział";
         } else {
-            // ZLECENIODAWCA: Pokazujemy guzik ZlećRemoncik, ukrywamy punkty
             pCounter.classList.add('hidden');
             addJobBtn.classList.remove('hidden');
             document.getElementById('activity-title').innerText = "🗂 Twoje Ogłoszenia";
@@ -320,6 +355,16 @@ function acceptCookies() {
     document.getElementById('cookie-banner').classList.add('hidden');
 }
 
+// STEROWANIE LEWĄ STRONĄ (LOGOWANIE / REJESTRACJA)
+function setAuthAction(action) {
+    authAction = action;
+    document.getElementById('auth-action-login').className = action === 'login' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
+    document.getElementById('auth-action-register').className = action === 'register' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
+    document.getElementById('register-password-specs').classList.toggle('hidden', action !== 'register');
+    document.getElementById('auth-main-btn').innerText = action === 'login' ? "Zaloguj do portalu" : "Zarejestruj konto i zaloguj";
+}
+
+// STEROWANIE PRAWĄ STRONĄ (ZLECENIODAWCA / WYKONAWCA)
 function setAuthRole(role) {
     authRole = role;
     document.getElementById('auth-role-klient').className = role === 'klient' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
@@ -350,60 +395,46 @@ async function handleAuth() {
     if(!e || !p) return alert("Wprowadź adres e-mail oraz hasło!");
 
     const btn = document.getElementById('auth-main-btn');
-    btn.disabled = true; btn.innerText = "Przetwarzanie żądania...";
+    btn.disabled = true; btn.innerText = "Przetwarzanie danych...";
 
-    const { data: signInData, error: signInError } = await db.auth.signInWithPassword({ email: e, password: p });
-
-    if (!signInError) {
-        btn.disabled = false; btn.innerText = "Zaloguj lub Rozpocznij Rejestrację";
-        return;
-    }
-
-    if (signInError.message.includes("Invalid login credentials") && signInError.status === 400) {
+    if (authAction === 'login') {
+        const { error } = await db.auth.signInWithPassword({ email: e, password: p });
+        btn.disabled = false; setAuthAction('login');
+        if (error) alert("Błąd logowania: " + error.message);
+    } else {
         if (!validatePassword(p)) {
-            btn.disabled = false; btn.innerText = "Zaloguj lub Rozpocznij Rejestrację";
-            return alert("Hasło nie spełnia wymogów nowego konta! Musi zawierać minimum 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
+            btn.disabled = false;
+            return alert("Hasło nie spełnia wymogów! Musi zawierać minimum 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
         }
 
-        const { data: signUpAttempt, error: signUpError } = await db.auth.signUp({ email: e, password: p });
-        
-        if (signUpError && signUpError.message.includes("User already registered")) {
-            btn.disabled = false; btn.innerText = "Zaloguj lub Rozpocznij Rejestrację";
-            return alert("To konto już istnieje, ale podałeś błędne hasło! Spróbuj ponownie.");
+        const { data, error } = await db.auth.signUp({ email: e, password: p });
+        if (error) {
+            btn.disabled = false;
+            return alert("Błąd rejestracji: " + error.message);
         }
 
-        if (!signUpError && signUpAttempt?.user) {
-            if (authRole === 'wykonawca') {
-                const checkedBoxes = document.querySelectorAll('.spec-checkbox-item:checked');
-                const wybraneSpecjalizacje = Array.from(checkedBoxes).map(cb => cb.value).join(", ") || "Ogólne prace remontowe";
+        if (authRole === 'wykonawca' && data.user) {
+            const checkedBoxes = document.querySelectorAll('.spec-checkbox-item:checked');
+            const wybraneSpecjalizacje = Array.from(checkedBoxes).map(cb => cb.value).join(", ") || "Ogólne prace remontowe";
 
-                await db.from('profile_wykonawcow').insert([{
-                    user_id: signUpAttempt.user.id,
-                    nazwa_firmy: document.getElementById('reg-firma').value || "Fachowiec",
-                    nip: document.getElementById('reg-nip').value || null,
-                    miejscowosc: document.getElementById('reg-miejscowosc').value || "Nie podano",
-                    kod_pocztowy: document.getElementById('reg-kod').value || "00-000",
-                    specjalizacja: wybraneSpecjalizacje,
-                    punkty: 10,
-                    telefon: phone || null
-                }]);
-            } else {
-                if(phone) {
-                    await db.auth.updateUser({ data: { telefon_kontaktowy: phone } });
-                }
-            }
-            alert("Konto zostało pomyślnie utworzone! Witamy w systemie ZlećRemoncik.");
-            btn.disabled = false; btn.innerText = "Zaloguj lub Rozpocznij Rejestrację";
-            window.location.reload();
-            return;
+            await db.from('profile_wykonawcow').insert([{
+                user_id: data.user.id,
+                nazwa_firmy: document.getElementById('reg-firma').value || "Fachowiec",
+                nip: document.getElementById('reg-nip').value || null,
+                miejscowosc: document.getElementById('reg-miejscowosc').value || "Nie podano",
+                kod_pocztowy: document.getElementById('reg-kod').value || "00-000",
+                specjalizacja: wybraneSpecjalizacje,
+                punkty: 10,
+                telefon: phone || null
+            }]);
+        } else if (phone && data.user) {
+            await db.auth.updateUser({ data: { telefon_kontaktowy: phone } });
         }
 
-        btn.disabled = false; btn.innerText = "Zaloguj lub Rozpocznij Rejestrację";
-        return alert("Problem z dostępem: " + signInError.message);
+        alert("Konto zostało pomyślnie utworzone i zalogowane!");
+        btn.disabled = false;
+        window.location.reload();
     }
-
-    btn.disabled = false; btn.innerText = "Zaloguj lub Rozpocznij Rejestrację";
-    return alert("Wystąpił błąd systemu: " + signInError.message);
 }
 
 async function signOut() { 
@@ -428,11 +459,7 @@ function toggleAccountMenu(open) {
 
 function toggleAddModal(open) {
     const modal = document.getElementById('add-modal-overlay');
-    if(open) {
-        modal.classList.remove('hidden');
-    } else {
-        modal.classList.add('hidden');
-    }
+    if(open) modal.classList.remove('hidden'); else modal.classList.add('hidden');
 }
 
 async function add() {
@@ -449,24 +476,15 @@ async function add() {
     }
 
     btn.disabled = true; btn.innerText = "Trwa publikowanie...";
-    
-    const wyznaczonaRolaWpisu = currentProfile ? 'wykonawca' : 'klient';
+    const wyznaczonaRolaWpisu = currentProfile ? 'wykonawca' : 'klient';[cite: 3]
     
     const insertData = {
-        tytul: tVal, 
-        miasto: mVal, 
-        opis: oVal, 
-        telefon: pVal, 
-        kategoria: kVal || 'Inne', 
-        user_id: currentUser.id, 
-        typ_wpisu: wyznaczonaRolaWpisu
+        tytul: tVal, miasto: mVal, opis: oVal, telefon: pVal, 
+        kategoria: kVal || 'Inne', user_id: currentUser.id, typ_wpisu: wyznaczonaRolaWpisu
     };
-    
-    if (pcVal && pcVal.trim() !== "") { 
-        insertData.kod_pocztowy = pcVal; 
-    }
+    if (pcVal && pcVal.trim() !== "") insertData.kod_pocztowy = pcVal;
 
-    const { data, error } = await db.from("zlecenia").insert([insertData]).select();
+    const { error } = await db.from("zlecenia").insert([insertData]).select();
 
     if (error) {
         alert("Błąd zapisu Supabase: " + error.message);
@@ -497,18 +515,13 @@ function setFilterRole(view) {
 
 async function load() {
     let q = db.from("zlecenia").select("*, zgleszenia:zgloszenia(id)").order("id", { ascending: false });
-    
     if (currentView !== 'wszystko') q = q.eq('typ_wpisu', currentView);
     
     const cityInput = document.getElementById('search-city').value.trim();
-    if (cityInput !== "") {
-        q = q.ilike('miasto', `%${cityInput}%`);
-    }
+    if (cityInput !== "") q = q.ilike('miasto', `%${cityInput}%`);
     
     const categorySelect = document.getElementById('search-category').value;
-    if (categorySelect !== "") {
-        q = q.eq('kategoria', categorySelect);
-    }
+    if (categorySelect !== "") q = q.eq('kategoria', categorySelect);
 
     const { data } = await q;
     const listEl = document.getElementById("list");
@@ -571,8 +584,6 @@ async function checkUrlRoute() {
         }
     }
 
-    const locString = z.kod_pocztowy ? `${z.miasto} (${z.kod_pocDbych})` : z.miasto;
-    // Naprawiona literówka przy wyświetlaniu detali
     const finalLocString = z.kod_pocztowy ? `${z.miasto} (${z.kod_pocztowy})` : z.miasto;
 
     document.getElementById('details-content').innerHTML = `
@@ -600,12 +611,7 @@ async function checkUrlRoute() {
     `;
 
     const opinionsSec = document.getElementById('opinions-section');
-    if (z.typ_wpisu === 'wykonawca') {
-        opinionsSec.classList.remove('hidden');
-        loadOpinions(z.user_id);
-    } else {
-        opinionsSec.classList.add('hidden');
-    }
+    if (z.typ_wpisu === 'wykonawca') { opinionsSec.classList.remove('hidden'); loadOpinions(z.user_id); } else { opinionsSec.classList.add('hidden'); }
 }
 
 async function applyForJob(zlecenieId) {
@@ -616,9 +622,7 @@ async function applyForJob(zlecenieId) {
     if(existing) return alert("Zgłosiłeś się już wcześniej!");
 
     const { error } = await db.from('zgloszenia').insert([{ zlecenie_id: zlecenieId, wykonawca_id: currentUser.id }]);
-    if (error) {
-        alert("Błąd operacji: " + error.message);
-    } else {
+    if (error) { alert("Błąd operacji: " + error.message); } else {
         await db.from('profile_wykonawcow').update({ punkty: currentProfile.punkty - 1 }).eq('user_id', currentUser.id);
         alert("Zgłoszono pomyślnie. Pobrano 1 punkt.");
         checkUrlRoute();
@@ -630,7 +634,6 @@ async function loadOpinions(wykonawcaId) {
     const { data } = await db.from('opinie').select('*').eq('wykonawca_id', wykonawcaId).order('id', {ascending: false});
     const list = document.getElementById('opinions-list');
     if (!data || data.length === 0) { list.innerHTML = `<p class="text-center py-10 text-slate-400 italic">Ten fachowiec nie posiada jeszcze opinii.</p>`; return; }
-    
     list.innerHTML = data.map(o => `
         <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
             <div class="flex justify-between items-center mb-3">
@@ -653,27 +656,14 @@ async function submitOpinion() {
 
     if(!em || !text) return alert("Uzupełnij swój e-mail oraz opis!");
 
-    const { error } = await db.from('opinie').insert([{ 
-        wykonawca_id: targetZlecenie.user_id, 
-        autor_email: em, 
-        gwiazdki: stars, 
-        tresc: text 
-    }]);
-    
-    if (error) {
-        alert("Błąd dodawania opinii: " + error.message); 
-    } else {
+    const { error } = await db.from('opinie').insert([{ wykonawca_id: targetZlecenie.user_id, autor_email: em, gwiazdki: stars, tresc: text }]);
+    if (error) { alert("Błąd dodawania opinii: " + error.message); } else {
         let bonus = 0;
-        if(stars === 5) bonus = 5;
-        else if(stars === 4) bonus = 4;
-        else if(stars === 3) bonus = 3;
-        else if(stars === 2) bonus = 2;
-
+        if(stars === 5) bonus = 5; else if(stars === 4) bonus = 4; else if(stars === 3) bonus = 3; else if(stars === 2) bonus = 2;
         if(bonus > 0) {
             const { data: prof } = await db.from('profile_wykonawcow').select('punkty').eq('user_id', targetZlecenie.user_id).maybeSingle();
             if(prof) await db.from('profile_wykonawcow').update({ punkty: prof.punkty + bonus }).eq('user_id', targetZlecenie.user_id);
         }
-
         alert(`Opinia została zapisana! Wykonawca otrzymał bonus: +${bonus} punktów.`);
         loadOpinions(targetZlecenie.user_id);
     }
@@ -681,7 +671,6 @@ async function submitOpinion() {
 
 async function loadAccountPanel() {
     const postsList = document.getElementById('user-posts-list');
-    
     if (!currentProfile) {
         const { data: posts } = await db.from('zlecenia').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy, telephone:telefon))').eq('user_id', currentUser.id);
         postsList.innerHTML = posts && posts.length > 0 ? posts.map(p => `
@@ -721,31 +710,18 @@ async function loadAccountPanel() {
 async function loadConversations() {
     const { data: chats } = await db.from('wiadomosci').select('zlecenie_id, zlecenie:zlecenia(tytul), nadawca_id, odbiorca_id, czy_przeczytane').or(`nadawca_id.eq.${currentUser.id},odbiorca_id.eq.${currentUser.id}`);
     const chatsList = document.getElementById('user-chats-list');
-    let unique = [];
-    let seen = new Set();
-    let unreadTotal = 0;
+    let unique = []; let seen = new Set(); let unreadTotal = 0;
     
     chats?.forEach(c => {
         const partner = c.nadawca_id === currentUser.id ? c.odbiorca_id : c.nadawca_id;
         const key = `${partner}-${c.zlecenie_id}`;
         if(c.odbiorca_id === currentUser.id && !c.czy_przeczytane) unreadTotal++;
-        
-        if(!seen.has(key)) { 
-            seen.add(key); 
-            unique.push({ partner, title: c.zlecenie?.tytul || "Ogłoszenie", zlId: c.zlecenie_id, unread: (c.odbiorca_id === currentUser.id && !c.czy_przeczytane) }); 
-        }
+        if(!seen.has(key)) { seen.add(key); unique.push({ partner, title: c.zlecenie?.tytul || "Ogłoszenie", zlId: c.zlecenie_id, unread: (c.odbiorca_id === currentUser.id && !c.czy_przeczytane) }); }
     });
 
     const notifyNode = document.getElementById('nav-notify');
     const badgeNode = document.getElementById('chat-notify-count');
-    if (unreadTotal > 0) {
-        notifyNode.classList.remove('hidden');
-        badgeNode.innerText = unreadTotal;
-        badgeNode.classList.remove('hidden');
-    } else {
-        notifyNode.classList.add('hidden');
-        badgeNode.classList.add('hidden');
-    }
+    if (unreadTotal > 0) { notifyNode.classList.remove('hidden'); badgeNode.innerText = unreadTotal; badgeNode.classList.remove('hidden'); } else { notifyNode.classList.add('hidden'); badgeNode.classList.add('hidden'); }
 
     chatsList.innerHTML = unique.map(c => `
         <button onclick="openChatBox('${c.partner}', ${c.zlId}, 'Konwersacja')" class="w-full text-left bg-slate-50 p-3 rounded-xl text-[11px] font-black border ${c.unread ? 'border-red-400 bg-red-50/50' : 'border-slate-100'} hover:bg-white hover:border-blue-300 transition-all block relative">
@@ -760,7 +736,6 @@ async function openChatBox(partnerId, zlId, partnerName) {
     document.getElementById('chat-partner-name').innerText = partnerName || "Rozmowa";
     document.getElementById('chat-box').classList.remove('hidden');
     document.getElementById('user-chats-list').classList.add('hidden');
-    
     await db.from('wiadomosci').update({ czy_przeczytane: true }).eq('zlecenie_id', zlId).eq('nadawca_id', partnerId).eq('odbiorca_id', currentUser.id);
     loadMessages();
 }
@@ -774,7 +749,6 @@ function closeChatBox() {
 async function loadMessages() {
     if(!activePartnerId) return;
     const { data } = await db.from('wiadomosci').select('*').eq('zlecenie_id', activeZlecenieId).or(`and(nadawca_id.eq.${currentUser.id},odbiorca_id.eq.${activePartnerId}),and(nadawca_id.eq.${activePartnerId},odbiorca_id.eq.${currentUser.id})`).order('created_at', { ascending: true });
-    
     const msgBox = document.getElementById('chat-messages');
     msgBox.innerHTML = data?.map(m => `
         <div class="max-w-[85%] ${m.nadawca_id === currentUser.id ? 'ml-auto bg-blue-600 text-white rounded-t-2xl rounded-bl-2xl' : 'mr-auto bg-white border border-slate-200 rounded-t-2xl rounded-br-2xl'} p-2.5 shadow-sm mb-1.5">
@@ -789,30 +763,17 @@ async function sendMessage() {
     const input = document.getElementById('chat-input');
     if(!input.value.trim()) return;
     await db.from('wiadomosci').insert([{ zlecenie_id: activeZlecenieId, nadawca_id: currentUser.id, odbiorca_id: activePartnerId, tresc: input.value, czy_przeczytane: false }]);
-    input.value = ""; 
-    loadMessages();
+    input.value = ""; loadMessages();
 }
 
-async function del(id) { 
-    if(confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) { 
-        await db.from("zlecenia").delete().eq('id', id); 
-        loadAccountPanel(); 
-    } 
-}
-async function editPost(id) { 
-    const nt = prompt("Wprowadź nowy tytuł:"); 
-    if(nt) { 
-        await db.from('zlecenia').update({tytul: nt}).eq('id', id); 
-        loadAccountPanel(); 
-    } 
-}
+async function del(id) { if(confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) { await db.from("zlecenia").delete().eq('id', id); loadAccountPanel(); } }
+async function editPost(id) { const nt = prompt("Wprowadź nowy tytuł:"); if(nt) { await db.from('zlecenia').update({tytul: nt}).eq('id', id); loadAccountPanel(); } }
 
 function openLegal(type) {
     const modal = document.getElementById('legal-modal');
     const title = document.getElementById('legal-title');
     const body = document.getElementById('legal-body');
     modal.classList.remove('hidden');
-    
     if(type === 'regulamin') {
         title.innerText = "Regulamin platformy ZlećRemoncik";
         body.innerHTML = `<p>1. Każdy wykonawca otrzymuje 10 punktów na start.</p><p>2. Zgłoszenie kosztuje 1 punkt.</p><p>3. Pula odnawia się o +3 pkt w każdy poniedziałek o 00:00.</p><p>4. Maksymalny limit zgłoszeń na jedno ogłoszenie wynosi 5 osób.</p>`;
