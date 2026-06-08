@@ -22,13 +22,11 @@
 </head>
 <body class="text-slate-900 pb-10">
 
-<!-- BANER COOKIE -->
 <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-4 z-50 text-xs flex flex-col sm:flex-row justify-between items-center gap-4 card-shadow">
     <p>Używamy plików cookie do zbierania danych i ulepszania naszych usług. Korzystając ze strony zgadzasz się na ich zapis w przeglądarce oraz akceptujesz politykę RODO. <button onclick="openLegal('rodo')" class="underline text-blue-400">Dowiedz się więcej</button></p>
     <button onclick="acceptCookies()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl font-bold uppercase whitespace-nowrap">Przyjmij</button>
 </div>
 
-<!-- NAWIGACJA -->
 <nav class="bg-white sticky top-0 z-40 border-b border-slate-200 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
         <div onclick="goBackToList()" class="text-2xl font-extrabold tracking-tighter text-slate-800 cursor-pointer">Zleć<span class="text-blue-600">Remoncik</span></div>
@@ -44,7 +42,6 @@
     </div>
 </nav>
 
-<!-- PANEL WYSÓWANY: MOJE KONTO -->
 <div id="account-sidebar-overlay" onclick="toggleAccountMenu(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden"></div>
 <div id="account-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white z-50 shadow-2xl slide-panel p-6 overflow-y-auto flex flex-col">
     <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
@@ -55,20 +52,17 @@
         <button onclick="toggleAccountMenu(false)" class="text-sm font-bold text-slate-400 hover:text-slate-600">✖ Zamknij</button>
     </div>
 
-    <!-- SEKCJA AKTYWNOŚCI -->
     <div class="mb-6">
         <h3 id="activity-title" class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">🗂 Twoja Aktywność</h3>
         <div id="user-posts-list" class="space-y-3"></div>
     </div>
 
-    <!-- SEKCJA CZATÓW -->
     <div class="border-t border-slate-100 pt-4 flex-1 flex flex-col">
         <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
             💬 Konwersacje <span id="chat-notify-count" class="bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[8px] hidden"></span>
         </h3>
         <div id="user-chats-list" class="space-y-2 overflow-y-auto flex-1"></div>
         
-        <!-- OKIENKO CZATU -->
         <div id="chat-box" class="hidden flex flex-col h-[300px] border border-slate-200 rounded-2xl p-3 bg-slate-50 mt-2">
             <div class="flex justify-between items-center mb-2 border-b border-slate-200 pb-1">
                 <span id="chat-partner-name" class="text-[10px] font-black text-slate-700 uppercase">Rozmowa</span>
@@ -83,10 +77,8 @@
     </div>
 </div>
 
-<!-- GŁÓWNA ZAWARTOŚĆ -->
 <main class="max-w-4xl mx-auto px-4 mt-8 relative z-20">
     
-    <!-- PANEL LOGOWANIA / REJESTRACJI -->
     <div id="auth-panel" class="bg-white p-6 sm:p-10 rounded-[2.5rem] card-shadow mb-8 border border-slate-100">
         <h2 class="text-center text-xl font-black mb-6">Witaj w ZlećRemoncik!</h2>
         <div class="space-y-4 max-w-md mx-auto">
@@ -131,7 +123,6 @@
         </div>
     </div>
 
-    <!-- PANEL DODAWANIA OGŁOSZEŃ -->
     <div id="add-panel" class="hidden bg-white p-8 rounded-[2.5rem] card-shadow mb-10 border-2 border-blue-50">
         <h2 class="text-xl font-black mb-6 flex items-center gap-2"><span class="bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full text-sm">+</span> Nowy wpis na tablicę</h2>
         <div class="space-y-4">
@@ -159,7 +150,6 @@
         </div>
     </div>
 
-    <!-- FILTRY -->
     <div id="filter-panel" class="mb-8">
         <div class="flex flex-wrap gap-2 justify-center">
             <button onclick="setFilter('wszystko')" id="v-all" class="px-6 py-2.5 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase shadow-md shadow-blue-100 transition-all">Wszystko</button>
@@ -168,12 +158,10 @@
         </div>
     </div>
 
-    <!-- WIDOK: SZCZEGÓŁY -->
     <div id="details-view" class="hidden mb-12">
         <button onclick="goBackToList()" class="mb-6 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-xs uppercase hover:bg-slate-50 transition-all">← Powrót do listy</button>
         <div id="details-content"></div>
         
-        <!-- Sekcja Opinii -->
         <div id="opinions-section" class="hidden mt-8 bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100">
             <h3 class="text-xl font-black mb-6 flex items-center gap-2">⭐ Opinie i Ocena wykonawcy</h3>
             <div id="opinions-list" class="space-y-6 mb-8"></div>
@@ -196,10 +184,8 @@
         </div>
     </div>
 
-    <!-- LISTA GŁÓWNA -->
     <div id="list" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20"></div>
 
-    <!-- MODAL PRAWNY -->
     <div id="legal-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-lg w-full card-shadow max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -210,7 +196,6 @@
         </div>
     </div>
 
-    <!-- STOPKA -->
     <footer class="mt-20 border-t border-slate-200 pt-10 pb-10 text-[10px] text-slate-400 leading-relaxed">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -367,7 +352,7 @@ function setRole(role) {
     document.getElementById('role-wykonawca').className = role === 'wykonawca' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
 }
 
-// FIX: NAPRAWIONA I ZABEZPIECZONA FUNKCJA DODAWANIA OGŁOSZENIA
+// FIX: ZMIANA NAZW TABEL Z 'zlecenie' NA 'zlecenia' ZGODNIE Z STRUCTURĄ SUPABASE
 async function add() {
     const btn = document.getElementById('add-btn');
     const tVal = document.getElementById("t").value;
@@ -397,8 +382,8 @@ async function add() {
         insertData.kod_pocztowy = pcVal; 
     }
 
-    // Wykonanie zapytania z jawnym przechwytywaniem błędów serwera RLS
-    const { data, error } = await db.from("zlecenie").insert([insertData]).select();
+    // Użycie poprawnej nazwy tabeli 'zlecenia'
+    const { data, error } = await db.from("zlecenia").insert([insertData]).select();
 
     if (error) {
         alert("Błąd zapisu Supabase: " + error.message + "\nUpewnij się, że nie blokują Cię uprawnienia Row Level Security (RLS).");
@@ -413,8 +398,8 @@ async function add() {
         document.getElementById("postcode").value = "";
         btn.disabled = false; 
         btn.innerText = "Opublikuj teraz";
-        load(); // Wymuszenie odświeżenia widoku głównego
-        if(currentUser) loadAccountPanel(); // Odświeżenie panelu bocznego
+        load(); 
+        if(currentUser) loadAccountPanel(); 
     }
 }
 
@@ -429,7 +414,8 @@ function setFilter(view) {
 }
 
 async function load() {
-    let q = db.from("zlecenie").select("*, zgleszenia:zgloszenia(id)").order("id", { ascending: false });
+    // Użycie poprawnej nazwy tabeli 'zlecenia'
+    let q = db.from("zlecenia").select("*, zgleszenia:zgloszenia(id)").order("id", { ascending: false });
     if (currentView !== 'wszystko') q = q.eq('typ_wpisu', currentView);
     const { data } = await q;
 
@@ -472,7 +458,8 @@ async function checkUrlRoute() {
     document.getElementById('filter-panel').classList.add('hidden');
     document.getElementById('details-view').classList.remove('hidden');
 
-    const { data: z } = await db.from("zlecenie").select("*").eq('id', id).single();
+    // Użycie poprawnej nazwy tabeli 'zlecenia'
+    const { data: z } = await db.from("zlecenia").select("*").eq('id', id).single();
     if (!z) return;
 
     const { count: totalApplicants } = await db.from('zgloszenia').select('*', { count: 'exact', head: true }).eq('zlecenie_id', id);
@@ -558,7 +545,8 @@ async function loadOpinions(wykonawcaId) {
 async function submitOpinion() {
     const hash = window.location.hash;
     const id = hash.replace('#ogloszenie-', '');
-    const { data: targetZlecenie } = await db.from("zlecenie").select("user_id").eq('id', id).single();
+    // Użycie poprawnej nazwy tabeli 'zlecenia'
+    const { data: targetZlecenie } = await db.from("zlecenia").select("user_id").eq('id', id).single();
 
     const em = document.getElementById('op-email').value;
     const stars = parseInt(document.getElementById('op-stars').value);
@@ -596,7 +584,8 @@ async function loadAccountPanel() {
     const postsList = document.getElementById('user-posts-list');
     
     if (!currentProfile) {
-        const { data: posts } = await db.from('zlecenie').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy, telephone:telefon))').eq('user_id', currentUser.id);
+        // Użycie poprawnej nazwy tabeli 'zlecenia'
+        const { data: posts } = await db.from('zlecenia').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy, telephone:telefon))').eq('user_id', currentUser.id);
         postsList.innerHTML = posts && posts.length > 0 ? posts.map(p => `
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
                 <div class="flex justify-between items-start mb-2">
@@ -620,7 +609,7 @@ async function loadAccountPanel() {
             </div>
         `).join("") : `<p class="text-center py-6 text-slate-400 text-xs">Nie dodałeś jeszcze ogłoszeń.</p>`;
     } else {
-        const { data: apps } = await db.from('zgloszenia').select('*, zlecenie(id, tytul, user_id)').eq('wykonawca_id', currentUser.id);
+        const { data: apps } = await db.from('zgloszenia').select('*, zlecenie:zlecenia(id, tytul, user_id)').eq('wykonawca_id', currentUser.id);
         postsList.innerHTML = apps && apps.length > 0 ? apps.map(a => `
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex justify-between items-center text-xs">
                 <span class="font-bold text-slate-700 truncate flex-1">📌 ${a.zlecenie?.tytul || 'Zlecenie'}</span>
@@ -632,7 +621,8 @@ async function loadAccountPanel() {
 }
 
 async function loadConversations() {
-    const { data: chats } = await db.from('wiadomosci').select('zlecenie_id, zlecenie:zlecenie(tytul), nadawca_id, odbiorca_id, czy_przeczytane').or(`nadawca_id.eq.${currentUser.id},odbiorca_id.eq.${currentUser.id}`);
+    // Użycie poprawnej nazwy tabeli 'zlecenia'
+    const { data: chats } = await db.from('wiadomosci').select('zlecenie_id, zlecenie:zlecenia(tytul), nadawca_id, odbiorca_id, czy_przeczytane').or(`nadawca_id.eq.${currentUser.id},odbiorca_id.eq.${currentUser.id}`);
     const chatsList = document.getElementById('user-chats-list');
     let unique = [];
     let seen = new Set();
@@ -708,14 +698,16 @@ async function sendMessage() {
 
 async function del(id) { 
     if(confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) { 
-        await db.from("zlecenie").delete().eq('id', id); 
+        // Użycie poprawnej nazwy tabeli 'zlecenia'
+        await db.from("zlecenia").delete().eq('id', id); 
         loadAccountPanel(); 
     } 
 }
 async function editPost(id) { 
     const nt = prompt("Wprowadź nowy tytuł:"); 
     if(nt) { 
-        await db.from('zlecenie').update({tytul: nt}).eq('id', id); 
+        // Użycie poprawnej nazwy tabeli 'zlecenia'
+        await db.from('zlecenia').update({tytul: nt}).eq('id', id); 
         loadAccountPanel(); 
     } 
 }
