@@ -295,16 +295,15 @@ async function signIn() {
     const e = document.getElementById('email').value;
     const p = document.getElementById('password').value;
     const { data, error } = await db.auth.signInWithPassword({ email: e, password: p });
-    if (error) return alert("Błąd logowania: " + error.message);
     
-    // Blokada logowania dla niepotwierdzonych kont e-mail (jeśli Supabase tak skonfigurowano)
-    if (data?.user && !data.user.email_confirmed_at) {
-        await db.auth.signOut();
-        return alert("Twój adres e-mail nie został jeszcze aktywowany. Kliknij w link wysłany na Twoją skrzynkę pocztową.");
+    if (error) {
+        if (error.message.includes("Email not confirmed")) {
+            return alert("Twój adres e-mail nie został jeszcze aktywowany! Otwórz swoją skrzynkę pocztową i kliknij w link aktywacyjny.");
+        }
+        return alert("Błąd logowania: " + error.message);
     }
 }
 
-// WALIDACJA HASŁA PRZY REJESTRACJI
 function validatePassword(pass) {
     if (pass.length < 8) return false;
     if (!/[A-Z]/.test(pass)) return false;
@@ -319,7 +318,7 @@ async function signUp() {
     if(!e || !p) return alert("Podaj adres email oraz bezpieczne hasło!");
 
     if (!validatePassword(p)) {
-        return alert("Hasło nie spełnia wymogów bezpieczeństwa! Musi zawierać minimum 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
+        return alert("Hasło nie spełnia wymogów! Musi zawierać minimum 8 znaków, dużą literę, cyfrę oraz znak specjalny.");
     }
 
     const { data, error } = await db.auth.signUp({ email: e, password: p });
@@ -337,9 +336,8 @@ async function signUp() {
         }]);
     }
     
-    // Wylogowanie z sesji tymczasowej, aby wymusić kliknięcie w link
     await db.auth.signOut();
-    alert("Konto zostało zarejestrowane! Na Twój adres e-mail wysłaliśmy link aktywacyjny. Musisz go potwierdzić przed pierwszym zalogowaniem.");
+    alert("Konto zostało zarejestrowane! Na Twój adres e-mail wysłaliśmy link aktywacyjny. Musisz go potwierdzić przed zalogowaniem się.");
     window.location.reload();
 }
 
@@ -369,6 +367,7 @@ function setRole(role) {
     document.getElementById('role-wykonawca').className = role === 'wykonawca' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
 }
 
+// FIX: NAPRAWIONA I ZABEZPIECZONA FUNKCJA DODAWANIA OGŁOSZENIA
 async function add() {
     const btn = document.getElementById('add-btn');
     const tVal = document.getElementById("t").value;
@@ -378,25 +377,45 @@ async function add() {
     const oVal = document.getElementById("o").value;
     const pcVal = document.getElementById("postcode").value;
 
-    if (!tVal || pVal.length !== 9) return alert("Uzupełnij formularz! Telefon musi mieć dokładnie 9 cyfr.");
+    if (!tVal || !mVal || !oVal || pVal.length !== 9) {
+        return alert("Uzupełnij formularz! Pola Tytuł, Miasto, Opis oraz 9-cyfrowy Telefon są obowiązkowe.");
+    }
 
     btn.disabled = true; btn.innerText = "Trwa publikowanie...";
     
     const insertData = {
-        tytul: tVal, miasto: mVal, opis: oVal, telefon: pVal, 
-        kategoria: kVal, user_id: currentUser.id, typ_wpisu: selectedRole
+        tytul: tVal, 
+        miasto: mVal, 
+        opis: oVal, 
+        telefon: pVal, 
+        kategoria: kVal || 'Inne', 
+        user_id: currentUser.id, 
+        typ_wpisu: selectedRole
     };
-    if (pcVal.trim() !== "") { insertData.kod_pocztowy = pcVal; }
+    
+    if (pcVal && pcVal.trim() !== "") { 
+        insertData.kod_pocztowy = pcVal; 
+    }
 
-    try {
-        await db.from("zlecenie").insert([insertData]);
-        alert("Ogłoszenie pojawiło się na tablicy!");
+    // Wykonanie zapytania z jawnym przechwytywaniem błędów serwera RLS
+    const { data, error } = await db.from("zlecenie").insert([insertData]).select();
+
+    if (error) {
+        alert("Błąd zapisu Supabase: " + error.message + "\nUpewnij się, że nie blokują Cię uprawnienia Row Level Security (RLS).");
+        btn.disabled = false; 
+        btn.innerText = "Opublikuj teraz";
+    } else {
+        alert("Sukces! Ogłoszenie pojawiło się na tablicy.");
         document.getElementById("t").value = "";
         document.getElementById("p").value = "";
         document.getElementById("o").value = "";
-        load();
-    } catch (err) { alert("Wystąpił problem: " + err.message); }
-    finally { btn.disabled = false; btn.innerText = "Opublikuj teraz"; }
+        document.getElementById("m").value = "";
+        document.getElementById("postcode").value = "";
+        btn.disabled = false; 
+        btn.innerText = "Opublikuj teraz";
+        load(); // Wymuszenie odświeżenia widoku głównego
+        if(currentUser) loadAccountPanel(); // Odświeżenie panelu bocznego
+    }
 }
 
 function setFilter(view) {
@@ -577,7 +596,7 @@ async function loadAccountPanel() {
     const postsList = document.getElementById('user-posts-list');
     
     if (!currentProfile) {
-        const { data: posts } = await db.from('zlecenie').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy, telefon))').eq('user_id', currentUser.id);
+        const { data: posts } = await db.from('zlecenie').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy, telephone:telefon))').eq('user_id', currentUser.id);
         postsList.innerHTML = posts && posts.length > 0 ? posts.map(p => `
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
                 <div class="flex justify-between items-start mb-2">
@@ -593,7 +612,7 @@ async function loadAccountPanel() {
                             <span class="font-black text-[10px] text-slate-700 truncate max-w-[150px]">🏗️ ${z.profile_wykonawcow?.nazwa_firmy || 'Fachowiec'}</span>
                             <div class="flex gap-1 shrink-0">
                                 <button onclick="openChatBox('${z.wykonawca_id}', ${p.id}, '${z.profile_wykonawcow?.nazwa_firmy}')" class="bg-slate-800 text-white px-2 py-1 rounded text-[8px] font-black uppercase">Czat</button>
-                                <button onclick="alert('Numer kontaktowy fachowca: ${z.profile_wykonawcow?.telefon || 'Brak danych'}')" class="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black uppercase">📞 Telefon</button>
+                                <button onclick="alert('Numer kontaktowy fachowca: ${z.profile_wykonawcow?.telephone || 'Brak danych'}')" class="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black uppercase">📞 Telefon</button>
                             </div>
                         </div>
                     `).join("") || '<p class="text-[9px] text-slate-400 uppercase">Oczekiwanie na oferty...</p>'}
@@ -613,7 +632,6 @@ async function loadAccountPanel() {
 }
 
 async function loadConversations() {
-    // NAPRAWIONE ZAPYTANIE OR DLA WIADOMOŚCI
     const { data: chats } = await db.from('wiadomosci').select('zlecenie_id, zlecenie:zlecenie(tytul), nadawca_id, odbiorca_id, czy_przeczytane').or(`nadawca_id.eq.${currentUser.id},odbiorca_id.eq.${currentUser.id}`);
     const chatsList = document.getElementById('user-chats-list');
     let unique = [];
