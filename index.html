@@ -113,11 +113,25 @@
             <input id="login-email" type="email" placeholder="email" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white font-medium text-sm transition-all">
             <input id="login-password" type="password" placeholder="hasło" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-400 focus:bg-white font-medium text-sm transition-all">
             
-            <button onclick="executeLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md transition-all">Zaloguj</button>
-            <div class="text-left pt-2">
+                        <button onclick="executeLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md transition-all">Zaloguj</button>
+            
+            <div class="relative py-4">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">Lub przez Google</span></div>
+            </div>
+
+            <select id="google-role" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-[10px] font-bold uppercase mb-2">
+                <option value="klient">Chcę Zlecać (Zleceniodawca)</option>
+                <option value="wykonawca">Chcę Zarabiać (Wykonawca)</option>
+            </select>
+            
+            <button onclick="loginWithGoogle()" class="w-full bg-white border-2 border-slate-100 hover:border-blue-400 text-slate-700 py-3 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-sm">
+                <img src="https://www.google.com/favicon.ico" class="w-4 h-4"> Zaloguj przez Google
+            </button>
+
+            <div class="text-left pt-4">
                 <button onclick="switchAuthView('register')" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">Brak konta? Zarejestruj się</button>
             </div>
-        </div>
 
         <div id="view-register" class="hidden space-y-4">
             <h2 class="text-xl font-black text-slate-800 tracking-tight">Rejestracja</h2>
