@@ -33,17 +33,23 @@ async function updateUI(session) {
 db.auth.onAuthStateChange((_, session) => updateUI(session));
 
 async function initAuth() {
-    const hash = window.location.hash;
-
-    if (hash.includes('access_token=')) {
-        history.replaceState(
-            {},
-            document.title,
-            '/Zlecremoncik/'
-        );
-    }
 
     const { data: { session } } = await db.auth.getSession();
+
+    if (session) {
+        updateUI(session);
+
+        if (window.location.hash.includes('access_token=')) {
+            history.replaceState(
+                {},
+                document.title,
+                window.location.pathname
+            );
+        }
+    } else {
+        checkUser();
+    }
+}
 
     if (session) {
         updateUI(session);
