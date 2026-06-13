@@ -127,9 +127,15 @@ async function signIn() {
     if (error) alert(error.message);
 }
 
-async function loginWithGoogle() {
-    const role = document.getElementById('google-role').value;
+async function executeLogin() {
+    const e = document.getElementById('login-email').value.trim();
+    const p = document.getElementById('login-password').value;
+    if(!e || !p) return alert("Podaj email i hasło!");
+    const { error } = await db.auth.signInWithPassword({ email: e, password: p });
+    if (error) alert("Błąd logowania: " + error.message);
+}
 
+async function loginWithGoogle() {
     localStorage.setItem('google_login_role', role);
 
     const { error } = await db.auth.signInWithOAuth({
