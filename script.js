@@ -250,11 +250,6 @@ async function startChat(tid, zid) {
     document.getElementById('chat-box').classList.remove('hidden');
     loadMessages();
 }
-async function startChat(tid, zid) {
-    activeTargetId = tid; activeZlecenieId = zid;
-    document.getElementById('chat-box').classList.remove('hidden');
-    loadMessages();
-}
 
 async function sendMessage() {
     const i = document.getElementById('chat-input');
