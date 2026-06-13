@@ -355,13 +355,14 @@ function acceptCookies() {
     document.getElementById('cookie-banner').classList.add('hidden');
 }
 
-async function executeLogin() {
-    const e = document.getElementById('login-email').value.trim();
-    const p = document.getElementById('login-password').value;
-    if(!e || !p) return alert("Podaj e-mail oraz hasło!");
-
-    const { error } = await db.auth.signInWithPassword({ email: e, password: p });
-    if (error) alert("Błąd logowania: " + error.message);
+async function loginWithGoogle() {
+    const role = document.getElementById('google-role').value;
+    localStorage.setItem('google_login_role', role); 
+    const { error } = await db.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: 'https://zlecremoncik.github.io/Zlecremoncik/' }
+    });
+    if (error) alert("Błąd Google: " + error.message);
 }
 
 async function loginWithGoogle() {
