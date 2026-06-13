@@ -240,11 +240,16 @@ async function loadAccountPanel() {
             <div class="space-y-1">
                 ${p.zgloszenia.map(z => `<button onclick="startChat('${z.wykonawca_id}', ${p.id})" class="w-full text-left bg-white p-3 rounded-xl text-[10px] font-bold border border-slate-100 shadow-sm">💬 ${z.profile_wykonawcow.nazwa_firmy}</button>`).join('')}
             </div>
-        </div>
+         </div>
     `).join('');
-    loadConversations();
 }
 
+async function startChat(tid, zid) {
+    activeTargetId = tid;
+    activeZlecenieId = zid;
+    document.getElementById('chat-box').classList.remove('hidden');
+    loadMessages();
+}
 async function startChat(tid, zid) {
     activeTargetId = tid; activeZlecenieId = zid;
     document.getElementById('chat-box').classList.remove('hidden');
