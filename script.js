@@ -56,31 +56,16 @@ async function updateUI(session) {
 db.auth.onAuthStateChange((_, session) => updateUI(session));
 
 async function initAuth() {
-
     const { data: { session } } = await db.auth.getSession();
-
     if (session) {
         updateUI(session);
-
         if (window.location.hash.includes('access_token=')) {
-            history.replaceState(
-                {},
-                document.title,
-                window.location.pathname
-            );
+            history.replaceState({}, document.title, window.location.pathname);
         }
     } else {
         checkUser();
     }
 }
-
-    if (session) {
-        updateUI(session);
-    } else {
-        checkUser();
-    }
-}
-
 initAuth();
 
 // MODAL MENU KONTRA
