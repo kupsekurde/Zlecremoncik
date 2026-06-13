@@ -161,8 +161,8 @@ async function add() {
 }
 
 async function load() {
-    // Tabela 'zlecenie' zgodnie ze screenem
-    let q = db.from('zlecenie').select('*, zgloszenia(id)').order('id', { ascending: false });
+    // Zmieniono 'zlecenie' na 'zlecenia' (liczba mnoga)
+    let q = db.from('zlecenia').select('*, zgloszenia(id)').order('id', { ascending: false });
     if (currentView !== 'wszystko') q = q.eq('typ_wpisu', currentView);
     const { data } = await q;
 
