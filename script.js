@@ -162,7 +162,7 @@ async function add() {
         telefon: document.getElementById('p').value, user_id: currentUser.id, typ_wpisu: selectedRole
     };
     if (data.telefon.length !== 9) return alert("Telefon musi mieć 9 cyfr!");
-    await db.from('zlecenie').insert([data]);
+    await db.from('zlecenia').insert([data]);
     alert("Dodano!"); load();
 }
 
@@ -195,7 +195,7 @@ async function openDetails(id) {
     document.getElementById('list-view').classList.add('hidden');
     document.getElementById('details-view').classList.remove('hidden');
     
-    const { data: z } = await db.from('zlecenie').select('*').eq('id', id).single();
+    const { data: z } = await db.from('zlecenia').select('*').eq('id', id).single();
     const { count } = await db.from('zgloszenia').select('*', { count: 'exact', head: true }).eq('zlecenie_id', id);
     
     let action = "";
@@ -229,7 +229,7 @@ async function apply(id) {
 
 // CZAT I KONTO
 async function loadAccountPanel() {
-    const { data: posts } = await db.from('zlecenie').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy))').eq('user_id', currentUser.id);
+    const { data: posts } = await db.from('zlecenia').select('*, zgloszenia(wykonawca_id, profile_wykonawcow(nazwa_firmy))').eq('user_id', currentUser.id);
     const container = document.getElementById('user-posts-list');
     container.innerHTML = posts.map(p => `
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
