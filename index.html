@@ -567,21 +567,37 @@ async function checkUrlRoute() {
 
     const finalLocString = z.kod_pocztowy ? `${z.miasto} (${z.kod_pocztowy})` : z.miasto;
 
-        document.getElementById('details-content').innerHTML = `
-        <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 space-y-6">
+            document.getElementById('details-content').innerHTML = `
+        <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 space-y-6 relative">
             <div class="flex justify-between items-start">
-                <h1 class="text-3xl font-black leading-tight uppercase">${z.tytul}</h1>
-                <div class="flex gap-2">
-                    <span class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">${z.kategoria || 'Inne'}</span>
-                    ${currentUser && currentUser.id === z.user_id ? `<button onclick="del(${z.id})" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-[10px] font-black border border-red-100 uppercase">Usuń</button>` : ''}
+                <div>
+                    <h1 class="text-3xl font-black leading-tight uppercase text-slate-900">${z.tytul}</h1>
+                    <div class="flex gap-2 mt-2">
+                        <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter border border-blue-100">${z.kategoria || 'Inne'}</span>
+                        <span class="bg-slate-50 text-slate-500 px-3 py-1 rounded-lg text-[9px] font-black uppercase border border-slate-100">📍 ${z.miasto}</span>
+                    </div>
+                </div>
+                ${currentUser && currentUser.id === z.user_id ? `
+                    <button onclick="del(${z.id})" class="bg-red-50 text-red-600 px-5 py-2 rounded-xl text-[10px] font-black border border-red-100 hover:bg-red-600 hover:text-white transition-all uppercase">Usuń Ogłoszenie</button>
+                ` : ''}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-y border-slate-100 py-6">
+                <div class="space-y-1">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kontakt bezpośredni:</p>
+                    <p class="text-xl font-bold text-slate-800">📞 ${z.telefon || 'Ukryty'}</p>
+                    <p class="text-sm font-medium text-blue-600 underline">${currentUser.email}</p>
+                </div>
+                <div class="space-y-1 md:text-right">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lokalizacja:</p>
+                    <p class="text-sm font-bold text-slate-700">${z.miasto} ${z.kod_pocztowy ? `(${z.kod_pocztowy})` : ''}</p>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-400 uppercase">
-                <span>📍 ${z.kod_pocztowy ? `${z.miasto} (${z.kod_pocztowy})` : z.miasto}</span>
+
+            <div class="text-slate-600 leading-relaxed whitespace-pre-wrap text-base">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Opis zlecenia:</p>
+                ${z.opis}
             </div>
-            <div class="text-slate-600 leading-relaxed whitespace-pre-wrap border-t border-slate-50 pt-6">${z.opis}</div>
-            ${z.typ_wpisu === 'klient' ? `
-            <div class="p-6 bg-slate-50 rounded-3xl">
                 <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Status zgłoszeń:</p>
                 <div class="flex items-center gap-4">
                     <div class="h-3 flex-1 bg-white rounded-full overflow-hidden border border-slate-200">
@@ -695,8 +711,7 @@ async function loadAccountPanel(page = 1) {
             </div>
         `).join('') || "Brak ogłoszeń.";
 
-    } else {
-        // WIDOK WYKONAWCY (Kupione - Zgodnie ze screenem)
+        } else {
         actTitle.innerText = "🛒 KUPIONE ZLECENIA (WYKONAWCA)";
         const { data: apps } = await db.from('zgloszenia').select('*, zlecenie:zlecenia(*)').eq('wykonawca_id', currentUser.id).order('created_at', {ascending: false});
         
@@ -704,25 +719,24 @@ async function loadAccountPanel(page = 1) {
         const pagedApps = apps?.slice(start, start + perPage);
 
         postsList.innerHTML = pagedApps?.map(a => `
-            <div class="border border-blue-200 rounded-2xl p-5 bg-white shadow-sm mb-4 cursor-pointer" onclick="openDetails(${a.zlecenie?.id})">
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-bold text-sm uppercase tracking-tight">${a.zlecenie?.tytul}</h4>
-                    <span class="text-[9px] bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-100 uppercase">Opłacone</span>
+            <div class="border border-blue-100 rounded-2xl p-4 bg-white shadow-sm mb-3 cursor-pointer hover:border-blue-400 transition-all" onclick="toggleAccountMenu(false); openDetails(${a.zlecenie?.id})">
+                <div class="flex justify-between items-start mb-1">
+                    <h4 class="font-extrabold text-[13px] uppercase tracking-tight">${a.zlecenie?.tytul || 'Zlecenie'}</h4>
+                    <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-black border border-blue-100 uppercase">Opłacone</span>
                 </div>
-                <p class="text-[11px] text-slate-500 mb-3">${a.zlecenie?.opis?.substring(0, 80)}...</p>
-                <div class="bg-slate-50 p-3 rounded-xl mb-4 text-[10px] space-y-1">
-                    <p><span class="text-slate-400">Dane Zleceniodawcy:</span> <span class="font-bold">${a.zlecenie?.user_email?.split('@')[0]}</span></p>
-                    <p><span class="text-slate-400">Telefon:</span> <span class="font-bold">${a.zlecenie?.telefon}</span></p>
-                    <p><span class="text-slate-400">Email:</span> <span class="font-bold">${a.zlecenie?.user_email}</span></p>
+                <p class="text-[10px] text-slate-400 line-clamp-1 mb-2">${a.zlecenie?.opis || ''}</p>
+                <div class="bg-slate-50 p-2 rounded-xl mb-3 text-[9px] space-y-0.5 border border-slate-100">
+                    <p><span class="text-slate-400">Dane Zleceniodawcy:</span> <span class="font-bold text-slate-700">Zleceniodawca #${a.zlecenie?.id}</span></p>
+                    <p><span class="text-slate-400">Telefon:</span> <span class="font-bold text-blue-600">${a.zlecenie?.telefon || 'Brak'}</span></p>
+                    <p><span class="text-slate-400">Email:</span> <span class="font-bold text-slate-700">${currentUser.email}</span></p>
                 </div>
-                <button onclick="event.stopPropagation(); openChatBox('${a.zlecenie?.user_id}', ${a.zlecenie?.id}, '${a.zlecenie?.user_email?.split('@')[0]}')" class="w-full bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors">Czat</button>
+                <button onclick="event.stopPropagation(); openChatBox('${a.zlecenie?.user_id}', ${a.zlecenie?.id}, 'Zleceniodawca')" class="w-full bg-[#1e293b] text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-colors">Czat</button>
             </div>
         `).join('') || "Brak zakupionych zleceń.";
 
-        // Paginacja
         const totalPages = Math.ceil((apps?.length || 0) / perPage);
         if (totalPages > 1) {
-            let paginHtml = `<div class="flex gap-2 justify-center mt-4 text-[10px] font-bold">`;
+            let paginHtml = `<div class="flex gap-2 justify-center mt-2 text-[10px] font-bold pb-4">`;
             for(let i=1; i<=totalPages; i++) {
                 paginHtml += `<button onclick="loadAccountPanel(${i})" class="${i===page ? 'text-blue-600 underline' : 'text-slate-400'}">${i}</button>`;
             }
