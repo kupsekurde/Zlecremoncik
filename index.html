@@ -556,14 +556,34 @@ async function checkUrlRoute() {
     document.getElementById('filter-panel').classList.add('hidden');
     document.getElementById('details-view').classList.remove('hidden');
 
-    const { data: z } = await db.from("zlecenia").select("*").eq('id', id).single();
+    // Pobieramy zlecenie wraz z mailem autora
+    const { data: z } = await db.from("zlecenia").select("*, autor:user_id(email)").eq('id', id).single();
     if (!z) return;
 
     const { count: totalApplicants } = await db.from('zgloszenia').select('*', { count: 'exact', head: true }).eq('zlecenie_id', id);
+    
+    // Sprawdzamy czy bieżący wykonawca zakupił już to zlecenie
+    let bzgloszenie = null;
+    if (currentUser) {
+        const { data: appData } = await db.from('zgloszenia').select('id').eq('zlecenie_id', id).eq('wykonawca_id', currentUser.id).maybeSingle();
+        bzgoszenie = appData;
+    }
+
+    const ownerEmail = z.autor?.email || 'Brak';
+    const ownerName = ownerEmail !== 'Brak' ? ownerEmail.split('@')[0] : 'Brak';
 
     let actionBtn = "";
+    let deleteBtnHtml = "";
+
     if (currentUser && z.typ_wpisu === 'klient' && z.user_id !== currentUser.id) {
-        if (totalApplicants >= 5) {
+        if (bzgoszenie) {
+            // Jeśli wykonawca już kupił to zlecenie, pokazujemy duży czerwony przycisk USUŃ według wzoru tak.jpg
+            deleteBtnHtml = `
+                <div class="flex justify-end pt-4 border-t border-slate-100">
+                    <button onclick="delBought('${bzgoszenie.id}')" class="bg-red-50 text-red-600 border border-red-200 px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-red-100 transition-all shadow-sm">USUŃ</button>
+                </div>
+            `;
+        } else if (totalApplicants >= 5) {
             actionBtn = `<div class="bg-red-50 text-red-600 p-4 rounded-2xl text-center font-black text-xs uppercase">Zebrano już komplet chętnych</div>`;
         } else {
             actionBtn = `<button onclick="applyForJob(${z.id})" class="w-full bg-amber-500 text-white py-5 rounded-2xl font-black uppercase text-sm shadow-lg shadow-amber-100 hover:scale-[1.01] transition-all">🙋 Jestem Zainteresowany (-1 pkt)</button>`;
@@ -573,17 +593,33 @@ async function checkUrlRoute() {
     const finalLocString = z.kod_pocztowy ? `${z.miasto} (${z.kod_pocztowy})` : z.miasto;
 
     document.getElementById('details-content').innerHTML = `
-        <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 space-y-6">
+        <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-slate-100 space-y-6 relative">
             <div class="flex justify-between items-start">
-                <h1 class="text-3xl font-black leading-tight">${z.tytul}</h1>
+                <h1 class="text-3xl font-black leading-tight text-slate-900">${z.tytul}</h1>
                 <span class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">${z.kategoria || 'Inne'}</span>
             </div>
+            
             <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-400 uppercase">
                 <span>📍 ${finalLocString}</span>
             </div>
-            <div class="text-slate-600 leading-relaxed whitespace-pre-wrap border-t border-slate-50 pt-6">${z.opis}</div>
+
+            <!-- Dane kontaktowe wyświetlane tylko, gdy użytkownik jest autorem lub wykupił zlecenie -->
+            ${(currentUser && (z.user_id === currentUser.id || bzgloszenie)) ? `
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 max-w-sm text-sm space-y-1">
+                <p><span class="text-slate-400">Dane Zleceniodawcy:</span> <span class="font-bold text-slate-800">${ownerName}</span></p>
+                <p><span class="text-slate-400">Telefon:</span> <span class="font-bold text-slate-900">${z.telefon || 'Brak'}</span></p>
+                <p><span class="text-slate-400">Email:</span> <span class="font-bold text-slate-800">${ownerEmail}</span></p>
+            </div>
+            ` : ''}
+
+            <div class="text-slate-600 leading-relaxed whitespace-pre-wrap border-t border-slate-50 pt-6 text-sm">${z.opis}</div>
+            
+            <div class="border-2 border-black p-4 inline-block font-bold text-xs text-red-600 uppercase tracking-wide">
+                ZDJĘCIA JEŚLI ZOSTAŁY DODANE
+            </div>
+
             ${z.typ_wpisu === 'klient' ? `
-            <div class="p-6 bg-slate-50 rounded-3xl">
+            <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                 <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Status zgłoszeń:</p>
                 <div class="flex items-center gap-4">
                     <div class="h-3 flex-1 bg-white rounded-full overflow-hidden border border-slate-200">
@@ -592,7 +628,9 @@ async function checkUrlRoute() {
                     <span class="text-sm font-black">${totalApplicants} / 5 Fachowców</span>
                 </div>
             </div>` : ''}
+            
             ${actionBtn}
+            ${deleteBtnHtml}
         </div>
     `;
 
@@ -700,29 +738,35 @@ async function loadAccountPanel(page = 1) {
     } else {
         // WIDOK WYKONAWCY (Kupione - Zgodnie ze screenem)
         actTitle.innerText = "🛒 KUPIONE ZLECENIA (WYKONAWCA)";
-        const { data: apps } = await db.from('zgloszenia').select('*, zlecenie:zlecenia(*)').eq('wykonawca_id', currentUser.id).order('created_at', {ascending: false});
+        
+        // Pobieramy zgłoszenia oraz dane zlecenia wraz z adresem email autora zlecenia (użytkownika auth)
+        const { data: apps } = await db.from('zgloszenia').select('*, zlecenie:zlecenia(*, autor:user_id(email))').eq('wykonawca_id', currentUser.id).order('created_at', {ascending: false});
         
         const start = (page - 1) * perPage;
         const pagedApps = apps?.slice(start, start + perPage);
 
-        postsList.innerHTML = pagedApps?.map(a => `
-            <div class="border border-blue-200 rounded-xl p-3 bg-white shadow-sm mb-2 cursor-pointer hover:border-blue-400 transition-all" onclick="openDetails(${a.zlecenie?.id})">
+        postsList.innerHTML = pagedApps?.map(a => {
+            const zol = a.zlecenie;
+            const ownerEmail = zol?.autor?.email || 'Brak';
+            const ownerName = ownerEmail !== 'Brak' ? ownerEmail.split('@')[0] : 'Brak';
+
+            return `
+            <div class="border border-blue-200 rounded-xl p-3 bg-white shadow-sm mb-2 cursor-pointer hover:border-blue-400 transition-all" onclick="openDetails(${zol?.id})">
                 <div class="flex justify-between items-center mb-1">
-                    <h4 class="font-bold text-xs uppercase tracking-tight text-slate-800">${a.zlecenie?.tytul}</h4>
+                    <h4 class="font-bold text-xs uppercase tracking-tight text-slate-800">${zol?.tytul || 'Brak tytułu'}</h4>
                     <span class="text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold border border-blue-100 uppercase">Opłacone</span>
                 </div>
-                <p class="text-[10px] text-slate-500 mb-1.5 line-clamp-1">${a.zlecenie?.opis}</p>
+                <p class="text-[10px] text-slate-500 mb-1.5 line-clamp-1">${zol?.opis || ''}</p>
                 <div class="bg-slate-50 p-2 rounded-lg mb-2 text-[10px] space-y-0.5 border border-slate-100">
-                    <p><span class="text-slate-400">Dane Zleceniodawcy:</span> <span class="font-bold">${a.zlecenie?.user_email?.split('@')[0] || 'undefined'}</span></p>
-                    <p><span class="text-slate-400">Telefon:</span> <span class="font-bold text-slate-700">${a.zlecenie?.telefon || 'Brak'}</span></p>
-                    <p><span class="text-slate-400">Email:</span> <span class="font-bold">${a.zlecenie?.user_email || 'undefined'}</span></p>
+                    <p><span class="text-slate-400">Dane Zleceniodawcy:</span> <span class="font-bold text-slate-700">${ownerName}</span></p>
+                    <p><span class="text-slate-400">Telefon:</span> <span class="font-bold text-slate-700">${zol?.telefon || 'Brak'}</span></p>
+                    <p><span class="text-slate-400">Email:</span> <span class="font-bold text-slate-700">${ownerEmail}</span></p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="event.stopPropagation(); openChatBox('${a.zlecenie?.user_id}', ${a.zlecenie?.id}, '${a.zlecenie?.user_email?.split('@')[0]}')" class="flex-1 bg-slate-900 text-white py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-black transition-colors">Czat</button>
-                    <button onclick="event.stopPropagation(); delBought('${a.id}')" class="px-3 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[10px] font-bold uppercase hover:bg-red-100 transition-colors">Usuń</button>
+                    <button onclick="event.stopPropagation(); openChatBox('${zol?.user_id}', ${zol?.id}, '${ownerName}')" class="w-full bg-slate-900 text-white py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-black transition-colors">Czat</button>
                 </div>
-            </div>
-        `).join('') || "Brak zakupionych zleceń.";
+            </div>`;
+        }).join('') || "Brak zakupionych zleceń.";
 
         // Paginacja
         const totalPages = Math.ceil((apps?.length || 0) / perPage);
