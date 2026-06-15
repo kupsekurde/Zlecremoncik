@@ -312,7 +312,7 @@ async function add() {
 }
 
 async function load() {
-    let query = db.from("Zlecenia").select("*").order("id", { ascending: false });
+    let query = db.from("zlecenia").select("*").order("id", { ascending: false });
     if (currentView !== 'wszystko') query = query.eq('typ_wpisu', currentView);
     if (currentCategoryFilter !== 'wszystkie') query = query.eq('kategoria', currentCategoryFilter);
     
@@ -355,7 +355,7 @@ async function load() {
 
 async function del(id) { 
     if(confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) { 
-        const { error } = await db.from("Zlecenia").delete().eq('id', id); 
+        const { error } = await db.from("zlecenia").delete().eq('id', id); 
         if (error) alert("Błąd usuwania: " + error.message);
         window.location.hash = "";
         load(); 
@@ -386,14 +386,14 @@ async function checkUrlRoute() {
         detailsView.classList.remove('hidden');
         detailsContent.innerHTML = `<p class="text-center text-slate-400 py-10">Ładowanie szczegółów ogłoszenia...</p>`;
 
-        const { data, error } = await db.from("Zlecenia").select("*").eq('id', id).single();
+        const { data, error } = await db.from("zlecenia").select("*").eq('id', id).single();
         
         if (error || !data) {
             detailsContent.innerHTML = `<p class="text-center text-red-500 font-bold py-10">Nie znaleziono takiego ogłoszenia.</p>`;
             return;
         }
 
-        await db.from("Zlecenia").update({ views: (data.views || 0) + 1 }).eq('id', id);
+        await db.from("zlecenia").update({ views: (data.views || 0) + 1 }).eq('id', id);
 
         const isOwner = currentUser && data.user_id === currentUser.id;
         const isPro = data.typ_wpisu === 'wykonawca';
