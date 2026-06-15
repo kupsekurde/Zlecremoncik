@@ -398,8 +398,7 @@ async function checkUrlRoute() {
         await db.from("zlecenia").update({ views: (data.views || 0) + 1 }).eq('id', id);
 
         const isOwner = currentUser && data.user_id === currentUser.id;
-
-        const isOwner = currentUser && data.user_id === currentUser.id;
+        
         const isPro = data.typ_wpisu === 'wykonawca';
 
         detailsContent.innerHTML = `
