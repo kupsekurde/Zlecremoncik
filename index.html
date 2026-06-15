@@ -10,7 +10,6 @@
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            /* Zmniejszyliśmy wartość z 0.88 na 0.60 - teraz zdjęcie będzie dużo wyraźniejsze! */
             background-image: linear-gradient(rgba(248, 250, 252, 0.60), rgba(248, 250, 252, 0.60)), url('kuchnia.png');
             background-attachment: fixed;
             background-size: cover;
@@ -151,7 +150,6 @@
         </div>
     </div>
 
-    <!-- Kontener na szczegóły ogłoszenia, którego brakowało -->
     <div id="details-view" class="hidden mb-12 relative z-30">
         <button onclick="goBackToList()" class="mb-4 px-5 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-black text-xs uppercase shadow-sm hover:bg-slate-50 transition-all">⬅ Powrót do listy</button>
         <div id="details-content"></div>
@@ -277,7 +275,6 @@ async function add() {
             photoUrl = db.storage.from('ZDJECIA').getPublicUrl(fileName).data.publicUrl;
         }
 
-        // TUTAJ POPRAWIONE NA MAŁE LITERKI: zlecenia
         const { error: dbErr } = await db.from("zlecenia").insert([{
             tytul: tVal, 
             miasto: mVal, 
@@ -378,7 +375,7 @@ async function checkUrlRoute() {
         
         document.getElementById('add-panel').classList.add('hidden');
         document.getElementById('auth-panel').classList.add('hidden');
-        document.getElementById('filter-kategoria').parentElement.parentElement.classList.add('hidden');
+        document.getElementById('filter-kategoria').parentElement.classList.add('hidden');
         document.getElementById('list').classList.add('hidden');
         
         const detailsView = document.getElementById('details-view');
@@ -386,7 +383,6 @@ async function checkUrlRoute() {
         detailsView.classList.remove('hidden');
         detailsContent.innerHTML = `<p class="text-center text-slate-400 py-10">Ładowanie szczegółów ogłoszenia...</p>`;
 
-        // Zmiana "Zlecenia" na "zlecenia"
         const { data, error } = await db.from("zlecenia").select("*").eq('id', id).single();
         
         if (error || !data) {
@@ -394,16 +390,14 @@ async function checkUrlRoute() {
             return;
         }
 
-        // Zmiana "Zlecenia" na "zlecenia"
         await db.from("zlecenia").update({ views: (data.views || 0) + 1 }).eq('id', id);
 
         const isOwner = currentUser && data.user_id === currentUser.id;
-        
         const isPro = data.typ_wpisu === 'wykonawca';
 
         detailsContent.innerHTML = `
             <div class="bg-white rounded-[2rem] card-shadow overflow-hidden border border-slate-200 relative z-30 block p-6 md:p-8">
-                ${data.zdjecie_url ? `<img src="${data.zdjecie_url}" class="w-full max-h-[300px] object-cover rounded-2xl mb-6 shadow-sm" alt="Zdjęcie">` : ''}
+                ${data.zdjekie_url ? `<img src="${data.zdjecie_url}" class="w-full max-h-[300px] object-cover rounded-2xl mb-6 shadow-sm" alt="Zdjęcie">` : ''}
                 <div class="space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                         <span class="text-xs font-black px-2.5 py-1 rounded bg-slate-100 uppercase text-slate-700">${data.kategoria || 'Inne'}</span>
@@ -436,7 +430,7 @@ async function checkUrlRoute() {
     } else {
         document.getElementById('details-view').classList.add('hidden');
         document.getElementById('list').classList.remove('hidden');
-        document.getElementById('filter-kategoria').parentElement.parentElement.classList.remove('hidden');
+        document.getElementById('filter-kategoria').parentElement.classList.remove('hidden');
         
         if (currentUser) {
             document.getElementById('add-panel').classList.remove('hidden');
