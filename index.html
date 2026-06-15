@@ -7,21 +7,24 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
-    <style>
+        <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-image: linear-gradient(rgba(248, 250, 252, 0.60), rgba(248, 250, 252, 0.60)), url('kuchnia.png');
-            background-attachment: fixed;
+            background: url('kuchnia.png') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
         }
-        .card-shadow { box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08); }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .card-shadow { box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1); }
         .hidden { display: none !important; }
-                .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Styl dla wyskakującego okna ogłoszenia */
-        #details-view { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        #details-container { background: white; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; border-radius: 2.5rem; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        /* Modal Ogłoszenia */
+        #details-view { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        #details-container { background: white; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto; border-radius: 2rem; position: relative; }
+        /* Sidebar Konta */
+        #account-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 400px; background: white; z-index: 110; transform: translateX(100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
+        #account-sidebar.active { transform: translateX(0); }
+        /* Czat dymki */
+        .bubble-me { background: #2563eb; color: white; align-self: flex-end; border-radius: 1rem 1rem 0 1rem; }
+        .bubble-them { background: #f1f5f9; color: #1e293b; align-self: flex-start; border-radius: 1rem 1rem 1rem 0; }
     </style>
 </head>
 <body class="text-slate-900">
@@ -36,76 +39,57 @@
     </div>
 </nav>
 
+<nav class="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="text-2xl font-extrabold tracking-tighter text-slate-800">Zleć<span class="text-blue-600">Remoncik</span></div>
+        <div class="flex items-center gap-3">
+            <button id="acc-btn" onclick="toggleAccount()" class="hidden text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-full uppercase">Moje Konto</button>
+            <button id="logout-btn" onclick="signOut()" class="hidden text-[10px] font-bold text-red-400 uppercase">Wyloguj</button>
+        </div>
+    </div>
+</nav>
+
 <main class="max-w-3xl mx-auto px-4 mt-10 relative z-20">
-    <div id="auth-panel" class="bg-white p-8 rounded-3xl card-shadow mb-8 border border-slate-100">
-        <div class="space-y-4">
-            <input id="email" type="email" placeholder="E-mail" class="w-full bg-slate-50 border-2 p-4 rounded-2xl outline-none focus:border-blue-400">
-            <input id="password" type="password" placeholder="Hasło" class="w-full bg-slate-50 border-2 p-4 rounded-2xl outline-none focus:border-blue-400">
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="signIn()" class="bg-blue-600 text-white py-4 rounded-2xl font-bold uppercase text-xs">Zaloguj</button>
-                <button onclick="signUp()" class="bg-slate-800 text-white py-4 rounded-2xl font-bold uppercase text-xs">Rejestruj</button>
+    <!-- SIDEBAR KONTU -->
+    <div id="account-sidebar" class="p-6 overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-black uppercase">Panel Użytkownika</h2>
+            <button onclick="toggleAccount()" class="text-slate-400 font-bold">✕</button>
+        </div>
+        <div id="account-content" class="space-y-8">
+            <div>
+                <h3 class="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-widest">Twoja Aktywność</h3>
+                <div id="user-activity" class="space-y-3"></div>
+            </div>
+            <div>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Konwersacje</h3>
+                <div id="chat-list" class="space-y-2 text-sm italic text-slate-400">Brak aktywnych rozmów.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OKNO CZATU (MODAL) -->
+    <div id="chat-modal" class="fixed inset-0 bg-black/50 z-[120] flex items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-w-md h-[600px] rounded-3xl flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+                <span class="font-bold text-sm" id="chat-title">Rozmowa</span>
+                <button onclick="closeChat()" class="text-slate-400 font-bold">✕</button>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 bg-slate-100/50"></div>
+            <div class="p-4 border-t flex gap-2">
+                <input id="chat-input" placeholder="Wiadomość..." class="flex-1 bg-slate-50 p-3 rounded-xl outline-none text-sm">
+                <button onclick="sendMsg()" class="bg-blue-600 text-white px-5 rounded-xl font-bold">▶</button>
             </div>
         </div>
     </div>
 
     <div id="add-panel" class="hidden bg-white p-8 rounded-3xl card-shadow mb-12 border-2 border-blue-50">
         <div class="space-y-4">
-            <div class="p-1 bg-slate-100 rounded-2xl flex gap-1 mb-4">
-                <button id="role-klient" onclick="setRole('klient')" class="flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase">Szukam Pomocy</button>
-                <button id="role-wykonawca" onclick="setRole('wykonawca')" class="flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase">Jestem Fachowcem</button>
-            </div>
-            
-            <input id="t" placeholder="Tytuł ogłoszenia" class="w-full bg-slate-50 border-2 p-3 rounded-xl outline-none focus:border-blue-300">
-            <div class="grid grid-cols-2 gap-4">
-                <input id="m" placeholder="Miasto" class="w-full bg-slate-50 border-2 p-3 rounded-xl outline-none focus:border-blue-300">
-                <select id="k" class="w-full bg-slate-50 border-2 p-3 rounded-xl outline-none font-bold text-sm">
-                    <option value="">📁 Wybierz kategorię...</option>
-                    <optgroup label="🛠️ Generalne i Kompleksowe">
-                        <option value="Remonty kompleksowe">Remonty kompleksowe</option>
-                        <option value="Wykończenia wnętrz">Wykończenia wnętrz (stan deweloperski)</option>
-                        <option value="Remonty łazienek">Remonty łazienek (od A do Z)</option>
-                        <option value="Remonty kuchni">Remonty kuchni</option>
-                    </optgroup>
-                    <optgroup label="🧱 Ściany i Sufity">
-                        <option value="Malowanie i gładzie">Malowanie i gładzie</option>
-                        <option value="Glazura, płytki i gres">Glazura, płytki i gres</option>
-                        <option value="Sucha zabudowa i sufity G-K">Sucha zabudowa i sufity G-K</option>
-                        <option value="Tapetowanie i fototapety">Tapetowanie i fototapety</option>
-                        <option value="Tynki dekoracyjne">Tynki dekoracyjne i beton architektoniczny</option>
-                    </optgroup>
-                    <optgroup label="🪵 Podłogi">
-                        <option value="Podłogi i panele">Podłogi i panele (laminowane, winyle)</option>
-                        <option value="Parkiety i podłogi drewniane">Parkiety i podłogi drewniane</option>
-                        <option value="Cyklinowanie i renowacja">Cyklinowanie i renowacja podłóg</option>
-                        <option value="Listwy przypodłogowe">Listwy przypodłogowe</option>
-                    </optgroup>
-                    <optgroup label="⚡ Instalacje">
-                        <option value="Elektryka i oświetlenie">Elektryka i oświetlenie</option>
-                        <option value="Hydraulika i biały montaż">Hydraulika i biały montaż</option>
-                        <option value="Klimatyzacja i wentylacja">Klimatyzacja i wentylacja</option>
-                        <option value="Ogrzewanie">Ogrzewanie i technika grzewcza</option>
-                        <option value="Smart Home">Smart Home i automatyka domowa</option>
-                    </optgroup>
-                    <optgroup label="🪟 Stolarka i zabudowy">
-                        <option value="Montaż drzwi i okien">Montaż drzwi i okien</option>
-                        <option value="Meble na wymiar">Meble na wymiar i kuchnie</option>
-                        <option value="Montaż mebli z paczek">Montaż mebli z paczek (np. IKEA)</option>
-                        <option value="Schody i balustrady">Schody i balustrady</option>
-                    </optgroup>
-                    <optgroup label="🏡 Zewnętrzne i Przygotowawcze">
-                        <option value="Wyburzenia i skuwanie">Wyburzenia i skuwanie</option>
-                        <option value="Wywóz gruzu i sprzątanie">Wywóz gruzu i sprzątanie po remoncie</option>
-                        <option value="Ocieplenia i elewacje">Ocieplenia i elewacje</option>
-                        <option value="Remonty balkonów i tarasów">Remonty balkonów i tarasów</option>
-                        <option value="Izolacje i osuszanie">Izolacje i osuszanie ścian</option>
-                    </optgroup>
-                </select>
-            </div>
-            <textarea id="o" placeholder="Opis..." class="w-full bg-slate-50 border-2 p-3 rounded-xl h-24 outline-none focus:border-blue-300"></textarea>
-            <input id="p" type="tel" maxlength="9" placeholder="Telefon (9 cyfr)" class="w-full bg-slate-50 border-2 p-3 rounded-xl outline-none focus:border-blue-300">
-            
-            <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                <input id="img-input" type="file" accept="image/*" class="text-[10px] flex-1">
+            <!-- ... pola t, m, k, o, p ... -->
+            <div class="grid grid-cols-3 gap-2">
+                <input id="img1" type="file" accept="image/*" class="text-[8px] bg-slate-50 p-2 rounded-lg border border-dashed">
+                <input id="img2" type="file" accept="image/*" class="text-[8px] bg-slate-50 p-2 rounded-lg border border-dashed">
+                <input id="img3" type="file" accept="image/*" class="text-[8px] bg-slate-50 p-2 rounded-lg border border-dashed">
                 <div id="upload-spinner" class="hidden loader"></div>
             </div>
 
@@ -167,18 +151,10 @@
 <script>
 const SUPABASE_URL = "https://uodwrtpaesemcizdhcht.supabase.co";
 const SUPABASE_KEY = "sb_publishable_WVkoJLfkTfUD95EeSZMDQQ_VEhzlW6n";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Inicjalizacja klienta Supabase
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true }
-});
+let currentUser = null, activeChat = null;
 
-let currentUser = null;
-let selectedRole = 'klient';
-let currentView = 'wszystko';
-let currentCategoryFilter = 'wszystkie';
-
-// Funkcja sprawdzająca stan zalogowania użytkownika
 async function checkUser() {
     const { data: { session } } = await db.auth.getSession();
     updateUI(session);
@@ -188,22 +164,96 @@ function updateUI(session) {
     currentUser = session?.user || null;
     document.getElementById('auth-panel').classList.toggle('hidden', !!session);
     document.getElementById('add-panel').classList.toggle('hidden', !session);
+    document.getElementById('acc-btn').classList.toggle('hidden', !session);
     document.getElementById('logout-btn').classList.toggle('hidden', !session);
-    document.getElementById('user-info').innerText = session ? session.user.email : "";
+    if(session) loadAccount();
     load();
 }
 
-// Monitorowanie zmian zalogowania
-db.auth.onAuthStateChange((event, session) => {
-    updateUI(session);
-});
+function toggleAccount() { document.getElementById('account-sidebar').classList.toggle('active'); }
 
-// Uruchomienie przy starcie strony
+async function loadAccount() {
+    const { data } = await db.from('zlecenia').select('*').eq('user_id', currentUser.id);
+    const isPro = data.some(z => z.typ_wpisu === 'wykonawca');
+    const container = document.getElementById('user-activity');
+    
+    container.innerHTML = data.map(z => `
+        <div class="p-3 border rounded-xl flex justify-between items-center bg-white">
+            <div>
+                <p class="font-bold text-xs uppercase">${z.tytul}</p>
+                <p class="text-[10px] text-slate-400">${isPro ? 'Kupione Zlecenie' : 'Twoje Ogłoszenie'}</p>
+            </div>
+            <div class="flex gap-2">
+                ${!isPro ? `<button onclick="del(${z.id})" class="text-red-500 text-[10px] font-bold">USUŃ</button>` : ''}
+                <button onclick="openChat('${z.user_id}', ${z.id}, 'Zleceniodawca')" class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase">Czat</button>
+            </div>
+        </div>
+    `).join('') || "Brak aktywności.";
+}
+
+// CZAT LOGIKA
+async function openChat(pId, zId, name) {
+    activeChat = { pId, zId };
+    document.getElementById('chat-title').innerText = name;
+    document.getElementById('chat-modal').classList.remove('hidden');
+    loadMsgs();
+}
+
+async function loadMsgs() {
+    if(!activeChat) return;
+    const { data } = await db.from('wiadomosci').select('*').eq('zlecenie_id', activeChat.zId).order('created_at', {ascending:true});
+    const box = document.getElementById('chat-messages');
+    box.innerHTML = data?.map(m => `
+        <div class="p-3 max-w-[80%] text-xs font-medium ${m.nadawca_id === currentUser.id ? 'bubble-me' : 'bubble-them'}">
+            ${m.tresc}
+        </div>
+    `).join('') || "Brak wiadomości.";
+    box.scrollTop = box.scrollHeight;
+}
+
+async function sendMsg() {
+    const input = document.getElementById('chat-input');
+    if(!input.value) return;
+    await db.from('wiadomosci').insert([{ zlecenie_id: activeChat.zId, nadawca_id: currentUser.id, odbiorca_id: activeChat.pId, tresc: input.value }]);
+    input.value = ""; loadMsgs();
+}
+
+function closeChat() { document.getElementById('chat-modal').classList.add('hidden'); }
+
+// NAPRAWA ZNIKANIA
+async function checkUrlRoute() {
+    const hash = window.location.hash;
+    const view = document.getElementById('details-view');
+    if (hash.startsWith('#ogloszenie-')) {
+        const id = hash.replace('#ogloszenie-', '');
+        view.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        const { data: z } = await db.from("zlecenia").select("*").eq('id', id).single();
+        if (z) renderDetails(z);
+    } else {
+        view.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function renderDetails(z) {
+    document.getElementById('details-content').innerHTML = `
+        <div class="p-8 space-y-6">
+            <h1 class="text-3xl font-black uppercase">${z.tytul}</h1>
+            <div class="bg-slate-50 p-4 rounded-2xl border flex justify-between">
+                <div><p class="text-[10px] text-slate-400 font-bold uppercase">Kontakt</p><p class="font-bold">📞 ${z.telefon}</p></div>
+                <div class="text-right"><p class="text-[10px] text-slate-400 font-bold uppercase">Miasto</p><p class="font-bold">📍 ${z.miasto}</p></div>
+            </div>
+            <p class="text-slate-600 leading-relaxed">${z.opis}</p>
+            ${currentUser && currentUser.id !== z.user_id ? `<button onclick="openChat('${z.user_id}', ${z.id}, 'Ogłoszeniodawca')" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase shadow-xl">Rozpocznij Czat</button>` : ''}
+        </div>
+    `;
+}
+
+// INICJALIZACJA
+db.auth.onAuthStateChange((e, s) => updateUI(s));
 checkUser();
-
-// Sprawdzanie adresu URL (czy oglądamy szczegóły)
 window.addEventListener('hashchange', checkUrlRoute);
-
 function setRole(role) {
     selectedRole = role;
     document.getElementById('role-klient').className = role === 'klient' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
