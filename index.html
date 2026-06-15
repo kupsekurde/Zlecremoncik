@@ -153,7 +153,12 @@ const SUPABASE_URL = "https://uodwrtpaesemcizdhcht.supabase.co";
 const SUPABASE_KEY = "sb_publishable_WVkoJLfkTfUD95EeSZMDQQ_VEhzlW6n";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentUser = null, activeChat = null;
+// KLUCZOWE: Inicjalizacja zmiennych, aby funkcja load() się nie psuła
+let currentUser = null;
+let activeChat = null;
+let currentView = 'wszystko';
+let currentCategoryFilter = 'wszystkie';
+let selectedRole = 'klient';
 
 async function checkUser() {
     const { data: { session } } = await db.auth.getSession();
@@ -173,22 +178,26 @@ function updateUI(session) {
 function toggleAccount() { document.getElementById('account-sidebar').classList.toggle('active'); }
 
 async function loadAccount() {
-    const { data } = await db.from('zlecenia').select('*').eq('user_id', currentUser.id);
-    const isPro = data.some(z => z.typ_wpisu === 'wykonawca');
+    const { data: posts } = await db.from('zlecenia').select('*').eq('user_id', currentUser.id);
     const container = document.getElementById('user-activity');
     
-    container.innerHTML = data.map(z => `
-        <div class="p-3 border rounded-xl flex justify-between items-center bg-white">
-            <div>
+    // Sprawdzamy czy użytkownik ma jakiekolwiek ogłoszenie typu 'wykonawca'
+    const isPro = posts.some(z => z.typ_wpisu === 'wykonawca');
+
+    container.innerHTML = posts.map(z => `
+        <div class="p-4 border rounded-2xl flex justify-between items-center bg-white shadow-sm mb-2">
+            <div onclick="openDetails(${z.id})" class="cursor-pointer">
                 <p class="font-bold text-xs uppercase">${z.tytul}</p>
-                <p class="text-[10px] text-slate-400">${isPro ? 'Kupione Zlecenie' : 'Twoje Ogłoszenie'}</p>
+                <p class="text-[10px] ${z.typ_wpisu === 'wykonawca' ? 'text-amber-500' : 'text-blue-500'} font-bold uppercase">
+                    ${z.typ_wpisu === 'wykonawca' ? '⭐ Twój Profil Fachowca' : '📝 Twoje Zlecenie'}
+                </p>
             </div>
             <div class="flex gap-2">
-                ${!isPro ? `<button onclick="del(${z.id})" class="text-red-500 text-[10px] font-bold">USUŃ</button>` : ''}
-                <button onclick="openChat('${z.user_id}', ${z.id}, 'Zleceniodawca')" class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase">Czat</button>
+                <button onclick="del(${z.id})" class="text-red-500 p-2 hover:bg-red-50 rounded-lg">🗑️</button>
+                <button onclick="openChat('${z.user_id}', ${z.id}, 'Rozmowa')" class="bg-slate-800 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase">Czat</button>
             </div>
         </div>
-    `).join('') || "Brak aktywności.";
+    `).join('') || '<p class="text-center text-slate-400 text-xs py-4">Brak aktywności</p>';
 }
 
 // CZAT LOGIKA
@@ -224,30 +233,39 @@ function closeChat() { document.getElementById('chat-modal').classList.add('hidd
 async function checkUrlRoute() {
     const hash = window.location.hash;
     const view = document.getElementById('details-view');
+    const content = document.getElementById('details-content');
+
     if (hash.startsWith('#ogloszenie-')) {
         const id = hash.replace('#ogloszenie-', '');
-        view.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        view.classList.remove('hidden'); // Pokazujemy tylko okno MODAL
+        document.body.style.overflow = 'hidden'; // Blokujemy przewijanie tła
+        
+        content.innerHTML = `<p class="text-center py-20 animate-pulse">Ładowanie...</p>`;
+
         const { data: z } = await db.from("zlecenia").select("*").eq('id', id).single();
-        if (z) renderDetails(z);
+        if (z) {
+            content.innerHTML = `
+                <div class="p-6 sm:p-10 space-y-6">
+                    <div class="flex justify-between items-start">
+                        <h1 class="text-2xl sm:text-4xl font-black uppercase">${z.tytul}</h1>
+                        ${currentUser && currentUser.id === z.user_id ? `<button onclick="del(${z.id})" class="text-red-500 font-bold text-xs border border-red-200 px-3 py-1 rounded-lg">USUŃ</button>` : ''}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border">
+                        <div><p class="text-[10px] text-slate-400 font-bold uppercase">Kontakt</p><p class="font-bold">📞 ${z.telefon}</p></div>
+                        <div class="text-right"><p class="text-[10px] text-slate-400 font-bold uppercase">Miasto</p><p class="font-bold">📍 ${z.miasto}</p></div>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed whitespace-pre-wrap">${z.opis}</p>
+                    ${currentUser && currentUser.id !== z.user_id ? `<button onclick="openChat('${z.user_id}', ${z.id}, 'Ogłoszeniodawca')" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase shadow-xl">Rozpocznij Czat</button>` : ''}
+                </div>`;
+        }
     } else {
-        view.classList.add('hidden');
-        document.body.style.overflow = 'auto';
+        view.classList.add('hidden'); // Ukrywamy tylko okno MODAL
+        document.body.style.overflow = 'auto'; // Przywracamy przewijanie listy pod spodem
     }
 }
 
-function renderDetails(z) {
-    document.getElementById('details-content').innerHTML = `
-        <div class="p-8 space-y-6">
-            <h1 class="text-3xl font-black uppercase">${z.tytul}</h1>
-            <div class="bg-slate-50 p-4 rounded-2xl border flex justify-between">
-                <div><p class="text-[10px] text-slate-400 font-bold uppercase">Kontakt</p><p class="font-bold">📞 ${z.telefon}</p></div>
-                <div class="text-right"><p class="text-[10px] text-slate-400 font-bold uppercase">Miasto</p><p class="font-bold">📍 ${z.miasto}</p></div>
-            </div>
-            <p class="text-slate-600 leading-relaxed">${z.opis}</p>
-            ${currentUser && currentUser.id !== z.user_id ? `<button onclick="openChat('${z.user_id}', ${z.id}, 'Ogłoszeniodawca')" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase shadow-xl">Rozpocznij Czat</button>` : ''}
-        </div>
-    `;
+function openDetails(id) {
+    window.location.hash = `ogloszenie-${id}`;
 }
 
 // INICJALIZACJA
