@@ -28,7 +28,86 @@
     </style>
 </head>
 <body class="text-slate-900">
-\
+
+<nav class="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="text-2xl font-extrabold tracking-tighter text-slate-800">Zleć<span class="text-blue-600">Remoncik</span></div>
+        <div class="flex items-center gap-3">
+            <span id="user-info" class="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full uppercase"></span>
+            <button id="logout-btn" onclick="signOut()" class="hidden text-[10px] font-bold text-red-400 hover:text-red-600 uppercase">Wyloguj</button>
+        </div>
+    </div>
+</nav>
+
+<nav class="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="text-2xl font-extrabold tracking-tighter text-slate-800">Zleć<span class="text-blue-600">Remoncik</span></div>
+        <div class="flex items-center gap-3">
+            <button id="acc-btn" onclick="toggleAccount()" class="hidden text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-full uppercase">Moje Konto</button>
+            <button id="logout-btn" onclick="signOut()" class="hidden text-[10px] font-bold text-red-400 uppercase">Wyloguj</button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-3xl mx-auto px-4 mt-10 relative z-20">
+    <!-- SIDEBAR KONTU -->
+    <div id="account-sidebar" class="p-6 overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-black uppercase">Panel Użytkownika</h2>
+            <button onclick="toggleAccount()" class="text-slate-400 font-bold">✕</button>
+        </div>
+        <div id="account-content" class="space-y-8">
+            <div>
+                <h3 class="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-widest">Twoja Aktywność</h3>
+                <div id="user-activity" class="space-y-3"></div>
+            </div>
+            <div>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Konwersacje</h3>
+                <div id="chat-list" class="space-y-2 text-sm italic text-slate-400">Brak aktywnych rozmów.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OKNO CZATU (MODAL) -->
+    <div id="chat-modal" class="fixed inset-0 bg-black/50 z-[120] flex items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-w-md h-[600px] rounded-3xl flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-4 border-b flex justify-between items-center bg-slate-50">
+                <span class="font-bold text-sm" id="chat-title">Rozmowa</span>
+                <button onclick="closeChat()" class="text-slate-400 font-bold">✕</button>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 bg-slate-100/50"></div>
+            <div class="p-4 border-t flex gap-2">
+                <input id="chat-input" placeholder="Wiadomość..." class="flex-1 bg-slate-50 p-3 rounded-xl outline-none text-sm">
+                <button onclick="sendMsg()" class="bg-blue-600 text-white px-5 rounded-xl font-bold">▶</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-panel" class="hidden bg-white p-8 rounded-3xl card-shadow mb-12 border-2 border-blue-50">
+        <div class="space-y-4">
+            <!-- ... pola t, m, k, o, p ... -->
+            <div class="grid grid-cols-3 gap-2">
+                <input id="img1" type="file" accept="image/*" class="text-[8px] bg-slate-50 p-2 rounded-lg border border-dashed">
+                <input id="img2" type="file" accept="image/*" class="text-[8px] bg-slate-50 p-2 rounded-lg border border-dashed">
+                <input id="img3" type="file" accept="image/*" class="text-[8px] bg-slate-50 p-2 rounded-lg border border-dashed">
+                <div id="upload-spinner" class="hidden loader"></div>
+            </div>
+
+            <button onclick="add()" id="add-btn" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl uppercase transition-all">Dodaj ogłoszenie</button>
+        </div>
+    </div>
+
+    <div class="mb-8 space-y-3">
+        <div class="flex flex-wrap gap-2 justify-center">
+            <button onclick="setView('wszystko')" id="v-all" class="px-6 py-2 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase shadow-md">Wszystko</button>
+            <button onclick="setView('klient')" id="v-klient" class="px-6 py-2 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase">Zlecenia</button>
+            <button onclick="setView('wykonawca')" id="v-wykonawca" class="px-6 py-2 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase">Fachowcy</button>
+        </div>
+        <div class="max-w-xs mx-auto">
+            <select id="filter-kategoria" onchange="setCategoryFilter(this.value)" class="w-full bg-white border-2 border-slate-200 p-2.5 rounded-full outline-none font-bold text-xs text-center shadow-sm text-slate-700 focus:border-blue-400">
+                <option value="wszystkie">🔍 Wszystkie kategorie</option>
+                <option value="Remonty kompleksowe">Remonty kompleksowe</option>
+                <option value="Wykończenia wnętrz">Wykończenia wnętrz (stan deweloperski)</option>
                 <option value="Remonty łazienek">Remonty łazienek (od A do Z)</option>
                 <option value="Remonty kuchni">Remonty kuchni</option>
                 <option value="Malowanie i gładzie">Malowanie i gładzie</option>
@@ -54,7 +133,188 @@
                 <option value="Ocieplenia i elewacje">Ocieplenia i elewacje</option>
                 <option value="Remonty balkonów i tarasów">Remonty balkonów i tarasów</option>
                 <option value="Izolacje i osuszanie">Izolacje i osuszanie ścian</option>
-\
+            </select>
+        </div>
+    </div>
+
+        <!-- WYSKAKUJĄCE OKNO OGŁOSZENIA -->
+    <div id="details-view" class="hidden">
+        <div id="details-container">
+            <button onclick="goBackToList()" class="absolute top-6 right-6 z-50 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg text-slate-400 hover:text-red-500 transition-all font-bold">✕ Zamknij</button>
+            <div id="details-content"></div>
+        </div>
+    </div>
+
+    <div id="list" class="space-y-6 pb-20"></div>
+</main>
+
+<script>
+const SUPABASE_URL = "https://uodwrtpaesemcizdhcht.supabase.co";
+const SUPABASE_KEY = "sb_publishable_WVkoJLfkTfUD95EeSZMDQQ_VEhzlW6n";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// KLUCZOWE: Inicjalizacja zmiennych, aby funkcja load() się nie psuła
+let currentUser = null;
+let activeChat = null;
+let currentView = 'wszystko';
+let currentCategoryFilter = 'wszystkie';
+let selectedRole = 'klient';
+
+async function checkUser() {
+    const { data: { session } } = await db.auth.getSession();
+    updateUI(session);
+}
+
+function updateUI(session) {
+    currentUser = session?.user || null;
+    document.getElementById('auth-panel').classList.toggle('hidden', !!session);
+    document.getElementById('add-panel').classList.toggle('hidden', !session);
+    document.getElementById('acc-btn').classList.toggle('hidden', !session);
+    document.getElementById('logout-btn').classList.toggle('hidden', !session);
+    if(session) loadAccount();
+    load();
+}
+
+function toggleAccount() { document.getElementById('account-sidebar').classList.toggle('active'); }
+
+async function loadAccount() {
+    const { data: posts } = await db.from('zlecenia').select('*').eq('user_id', currentUser.id);
+    const container = document.getElementById('user-activity');
+    
+    // Sprawdzamy czy użytkownik ma jakiekolwiek ogłoszenie typu 'wykonawca'
+    const isPro = posts.some(z => z.typ_wpisu === 'wykonawca');
+
+    container.innerHTML = posts.map(z => `
+        <div class="p-4 border rounded-2xl flex justify-between items-center bg-white shadow-sm mb-2">
+            <div onclick="openDetails(${z.id})" class="cursor-pointer">
+                <p class="font-bold text-xs uppercase">${z.tytul}</p>
+                <p class="text-[10px] ${z.typ_wpisu === 'wykonawca' ? 'text-amber-500' : 'text-blue-500'} font-bold uppercase">
+                    ${z.typ_wpisu === 'wykonawca' ? '⭐ Twój Profil Fachowca' : '📝 Twoje Zlecenie'}
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="del(${z.id})" class="text-red-500 p-2 hover:bg-red-50 rounded-lg">🗑️</button>
+                <button onclick="openChat('${z.user_id}', ${z.id}, 'Rozmowa')" class="bg-slate-800 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase">Czat</button>
+            </div>
+        </div>
+    `).join('') || '<p class="text-center text-slate-400 text-xs py-4">Brak aktywności</p>';
+}
+
+// CZAT LOGIKA
+async function openChat(pId, zId, name) {
+    activeChat = { pId, zId };
+    document.getElementById('chat-title').innerText = name;
+    document.getElementById('chat-modal').classList.remove('hidden');
+    loadMsgs();
+}
+
+async function loadMsgs() {
+    if(!activeChat) return;
+    const { data } = await db.from('wiadomosci').select('*').eq('zlecenie_id', activeChat.zId).order('created_at', {ascending:true});
+    const box = document.getElementById('chat-messages');
+    box.innerHTML = data?.map(m => `
+        <div class="p-3 max-w-[80%] text-xs font-medium ${m.nadawca_id === currentUser.id ? 'bubble-me' : 'bubble-them'}">
+            ${m.tresc}
+        </div>
+    `).join('') || "Brak wiadomości.";
+    box.scrollTop = box.scrollHeight;
+}
+
+async function sendMsg() {
+    const input = document.getElementById('chat-input');
+    if(!input.value) return;
+    await db.from('wiadomosci').insert([{ zlecenie_id: activeChat.zId, nadawca_id: currentUser.id, odbiorca_id: activeChat.pId, tresc: input.value }]);
+    input.value = ""; loadMsgs();
+}
+
+function closeChat() { document.getElementById('chat-modal').classList.add('hidden'); }
+
+// INICJALIZACJA
+db.auth.onAuthStateChange((e, s) => updateUI(s));
+checkUser();
+window.addEventListener('hashchange', checkUrlRoute);
+function setRole(role) {
+    selectedRole = role;
+    document.getElementById('role-klient').className = role === 'klient' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
+    document.getElementById('role-wykonawca').className = role === 'wykonawca' ? 'flex-1 py-3 rounded-xl text-[10px] font-black bg-white shadow-sm uppercase' : 'flex-1 py-3 rounded-xl text-[10px] font-black text-slate-500 uppercase';
+}
+
+function setView(view) {
+    currentView = view;
+    ['v-all', 'v-klient', 'v-wykonawca'].forEach(id => {
+        document.getElementById(id).className = "px-6 py-2 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase";
+    });
+    document.getElementById('v-' + (view === 'wszystko' ? 'all' : view)).className = "px-6 py-2 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase shadow-md";
+    load();
+}
+
+function setCategoryFilter(category) {
+    currentCategoryFilter = category;
+    load();
+}
+
+async function signIn() {
+    const emailVal = document.getElementById('email').value;
+    const passwordVal = document.getElementById('password').value;
+    if(!emailVal || !passwordVal) { alert("Wpisz e-mail i hasło!"); return; }
+
+    const { error } = await db.auth.signInWithPassword({ 
+        email: emailVal, 
+        password: passwordVal 
+    });
+    if (error) alert("Błąd logowania: " + error.message);
+}
+
+async function signUp() {
+    const emailVal = document.getElementById('email').value;
+    const passwordVal = document.getElementById('password').value;
+    if(!emailVal || !passwordVal) { alert("Wpisz e-mail i hasło!"); return; }
+
+    const { error } = await db.auth.signUp({ 
+        email: emailVal, 
+        password: passwordVal 
+    });
+    if (error) alert("Błąd rejestracji: " + error.message); else alert("Rejestracja OK! Możesz się zalogować.");
+}
+
+async function signOut() { 
+    await db.auth.signOut(); 
+}
+
+async function add() {
+    const tVal = document.getElementById("t").value;
+    const pVal = document.getElementById("p").value;
+    const mVal = document.getElementById("m").value;
+    const kVal = document.getElementById("k").value;
+    const oVal = document.getElementById("o").value;
+
+    if (!tVal || pVal.length !== 9) { alert("Podaj tytuł i 9 cyfr telefonu!"); return; }
+    if (!currentUser) { alert("Zaloguj się ponownie!"); return; }
+
+    const btn = document.getElementById('add-btn');
+    const spinner = document.getElementById('upload-spinner');
+    btn.disabled = true;
+    btn.innerText = "Trwa publikowanie...";
+    spinner.classList.remove('hidden');
+
+        try {
+        let photoUrl = "";
+        // Sprawdzamy 3 pola zdjęć
+        for (let i = 1; i <= 3; i++) {
+            const file = document.getElementById('img' + i)?.files[0];
+            if (file) {
+                const ext = file.name.split('.').pop();
+                const fName = `${Date.now()}_${i}.${ext}`;
+                const { data: upData, error: stErr } = await db.storage.from('ZDJECIA').upload(fName, file);
+                if (stErr) throw stErr;
+                // Zapisujemy URL pierwszego zdjęcia jako główne
+                if (i === 1) photoUrl = db.storage.from('ZDJECIA').getPublicUrl(fName).data.publicUrl;
+            }
+        }
+
+        const { error: dbErr } = await db.from("zlecenia").insert([{
+            tytul: tVal, 
+            miasto: mVal, 
             opis: oVal, 
             telefon: pVal, 
             kategoria: kVal, 
