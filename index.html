@@ -406,35 +406,38 @@ function goBackToList() {
 
 async function checkUrlRoute() {
     const hash = window.location.hash;
-    const view = document.getElementById('details-view');
-    const content = document.getElementById('details-content');
-    if (!view || !content) return;
+    const detailsView = document.getElementById('details-view');
+    const detailsContent = document.getElementById('details-content');
+
+    if (!detailsView || !detailsContent) return;
 
     if (hash.startsWith('#ogloszenie-')) {
         const id = hash.replace('#ogloszenie-', '');
-        view.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; 
-        content.innerHTML = `<p class="text-center py-20 animate-pulse text-slate-400 font-bold uppercase">Ładowanie...</p>`;
 
-        const { data: z } = await db.from("zlecenia").select("*").eq('id', id).maybeSingle();
-        if (z) {
-            await db.from("zlecenia").update({ views: (z.views || 0) + 1 }).eq('id', id);
-            content.innerHTML = `
-                <div class="p-6 sm:p-10 space-y-8">
-                    <div class="flex justify-between items-start gap-4">
-                        <h1 class="text-2xl sm:text-4xl font-black uppercase text-slate-900 leading-tight">${z.tytul}</h1>
-                        ${currentUser && currentUser.id === z.user_id ? `<button onclick="del(${z.id})" class="bg-red-50 text-red-600 px-6 py-3 rounded-2xl text-[10px] font-black border border-red-100 hover:bg-red-600 hover:text-white transition-all uppercase">Usuń</button>` : ''}
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 border-y border-slate-100 py-8">
-                        <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Kontakt:</p><p class="text-2xl font-bold text-slate-800">📞 ${z.telefon}</p></div>
-                        <div class="sm:text-right"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Lokalizacja:</p><p class="text-sm font-bold text-slate-700 uppercase">📍 ${z.miasto}</p></div>
-                    </div>
-                    <div class="text-slate-600 leading-relaxed whitespace-pre-wrap text-base sm:text-lg">${z.opis}</div>
-                    ${currentUser && currentUser.id !== z.user_id ? `<button onclick="openChat('${z.user_id}', ${z.id}, 'Ogłoszeniodawca')" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase shadow-xl">Rozpocznij Czat</button>` : ''}
-                </div>`;
+        detailsView.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        detailsContent.innerHTML =
+            '<p class="text-center text-slate-400 py-20 font-bold uppercase tracking-widest animate-pulse">Ładowanie szczegółów...</p>';
+
+        const { data: z, error } =
+            await db.from("zlecenia").select("*").eq("id", id).single();
+
+        if (error || !z) {
+            detailsContent.innerHTML =
+                '<p class="text-center text-red-500 font-bold py-20">Nie znaleziono ogłoszenia.</p>';
+            return;
         }
+
+        detailsContent.innerHTML = `
+            <div class="p-6 sm:p-10">
+                <h1 class="text-2xl font-black mb-4">${z.tytul}</h1>
+                <p class="mb-4">📍 ${z.miasto}</p>
+                <p class="whitespace-pre-wrap">${z.opis}</p>
+            </div>
+        `;
     } else {
-        view.classList.add('hidden');
+        detailsView.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
 }
