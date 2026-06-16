@@ -566,10 +566,17 @@ async function checkUrlRoute() {
     
     // Sprawdzamy czy bieżący wykonawca zakupił już to zlecenie
     let bzgloszenie = null;
-    if (currentUser) {
-        const { data: appData } = await db.from('zgloszenia').select('id').eq('zlecenie_id', id).eq('wykonawca_id', currentUser.id).maybeSingle();
-        bzgoszenie = appData;
-    }
+
+if (currentUser) {
+    const { data: appData } = await db
+        .from('zgloszenia')
+        .select('id')
+        .eq('zlecenie_id', id)
+        .eq('wykonawca_id', currentUser.id)
+        .maybeSingle();
+
+    bzgloszenie = appData;
+}
 
     const ownerEmail = z.autor?.email || 'Brak';
     const ownerName = ownerEmail !== 'Brak' ? ownerEmail.split('@')[0] : 'Brak';
@@ -578,7 +585,7 @@ async function checkUrlRoute() {
     let deleteBtnHtml = "";
 
     if (currentUser && z.typ_wpisu === 'klient' && z.user_id !== currentUser.id) {
-        if (bzgoszenie) {
+        if (bzgloszenie) {
             // Jeśli wykonawca już kupił to zlecenie, pokazujemy duży czerwony przycisk USUŃ według wzoru tak.jpg
             deleteBtnHtml = `
                 <div class="flex justify-end pt-4 border-t border-slate-100">
