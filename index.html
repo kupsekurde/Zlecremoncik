@@ -468,14 +468,6 @@ async function checkUrlRoute() {
 }
 
 
-// Inicjalizacja bez nadpisywania updateUI
-db.auth.onAuthStateChange((e, s) => {
-    updateUI(s);
-    checkUrlRoute();
-});
-checkUser();
-window.addEventListener('hashchange', checkUrlRoute);
-};
 </script>
 </body>
 </html>
