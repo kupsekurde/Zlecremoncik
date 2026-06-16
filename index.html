@@ -396,12 +396,37 @@ async function del(id) {
     } 
 }
 
-function openDetails(id) {
-    window.location.hash = `ogloszenie-${id}`;
+async function openDetails(id) {
+    const detailsView = document.getElementById('details-view');
+    const detailsContent = document.getElementById('details-content');
+
+    detailsView.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    detailsContent.innerHTML =
+        '<p class="text-center py-20">Ładowanie...</p>';
+
+    const { data: z, error } =
+        await db.from("zlecenia").select("*").eq("id", id).single();
+
+    if (error || !z) {
+        detailsContent.innerHTML =
+            '<p class="text-center text-red-500 py-20">Nie znaleziono ogłoszenia.</p>';
+        return;
+    }
+
+    detailsContent.innerHTML = `
+        <div class="p-6">
+            <h1 class="text-3xl font-black mb-4">${z.tytul}</h1>
+            <p class="mb-4">📍 ${z.miasto}</p>
+            <p class="whitespace-pre-wrap">${z.opis}</p>
+        </div>
+    `;
 }
 
 function goBackToList() {
-    window.location.hash = "";
+    document.getElementById('details-view').classList.add('hidden');
+    document.body.style.overflow = 'auto';
 }
 
 async function checkUrlRoute() {
@@ -443,7 +468,6 @@ async function checkUrlRoute() {
 }
 
 function openDetails(id) { window.location.hash = `ogloszenie-${id}`; }
-function goBackToList() { window.location.hash = ""; }
 
 // Inicjalizacja bez nadpisywania updateUI
 db.auth.onAuthStateChange((e, s) => {
